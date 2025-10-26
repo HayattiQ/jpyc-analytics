@@ -39,8 +39,6 @@ const normalizeSupply = (hexValue: string, decimals: number) => {
   return integerPart + fractionPart
 }
 
-const getCovalentKey = () => config.holderApi?.apiKey ?? 'ckey_docs'
-
 export const useChainMetrics = () => {
   const [supplies, setSupplies] = useState<ChainMetrics[]>([])
   const [status, setStatus] = useState<SupplyStatus>('idle')
@@ -75,30 +73,40 @@ export const useChainMetrics = () => {
   }, [])
 
   const fetchHolderCount = useCallback(async (chain: ChainConfig) => {
-    const covalentChainId = chain.holder?.covalentChainId
-    if (!covalentChainId) return null
+    if (!chain.subgraphUrl || !chain.globalStatId) {
+      return null
+    }
 
-    const apiKey = getCovalentKey()
-    const url = `https://api.covalenthq.com/v1/${covalentChainId}/tokens/${chain.tokenAddress}/token_holders/?page-size=1&key=${apiKey}`
-    const response = await fetch(url)
+    const response = await fetch(chain.subgraphUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          query GlobalStat($id: ID!) {
+            globalStat(id: $id) {
+              holderCount
+            }
+          }
+        `,
+        variables: { id: chain.globalStatId }
+      })
+    })
 
     if (!response.ok) {
-      throw new Error(`Covalent error (${chain.name}): ${response.status}`)
+      throw new Error(`Subgraph error (${chain.name}): ${response.status}`)
     }
 
-    const body = (await response.json()) as {
-      data?: {
-        pagination?: { total_count?: number }
-      }
-      error?: boolean
-      error_message?: string
+    const payload = (await response.json()) as {
+      data?: { globalStat?: { holderCount: string } | null }
+      errors?: { message: string }[]
     }
 
-    if (body.error) {
-      throw new Error(body.error_message ?? `Unknown Covalent error for ${chain.name}`)
+    if (payload.errors && payload.errors.length > 0) {
+      throw new Error(payload.errors[0].message)
     }
 
-    return body.data?.pagination?.total_count ?? null
+    const holderCount = payload.data?.globalStat?.holderCount
+    return typeof holderCount === 'string' ? Number(holderCount) : null
   }, [])
 
   const loadSupplies = useCallback(async () => {
