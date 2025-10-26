@@ -16,9 +16,6 @@ export const HeroPanel = ({ lastUpdated, isLoading, onRefresh }: HeroPanelProps)
         </p>
       </div>
       <div className="hero-meta">
-        <button className="ghost-button" onClick={onRefresh}>
-          手動更新
-        </button>
         <div className="timestamp">
           最終更新:{' '}
           {lastUpdated
