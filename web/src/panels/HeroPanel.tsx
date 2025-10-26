@@ -8,11 +8,11 @@ export const HeroPanel = ({ lastUpdated, isLoading, onRefresh }: HeroPanelProps)
   return (
     <header className="hero">
       <div>
-        <p className="eyebrow">M0 · Direct Contract Reads</p>
-        <h1>JPYC Supply Monitor</h1>
+        <h1>JPYC Analytics</h1>
         <p className="lede">
-          リアルタイムで Polygon / Avalanche / Ethereum の JPYC 供給量を取得し、
-          ひと目で比較できる横棒グラフにまとめました。
+          リアルタイムで JPYC のオンチェーン情報を取得し、
+          ひと目で比較できるグラフにまとめました。
+          Powered by <a href="https://x.com/HayattiQ">HayattiQ</a>
         </p>
       </div>
       <div className="hero-meta">

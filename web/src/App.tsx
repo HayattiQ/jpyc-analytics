@@ -2,6 +2,7 @@ import './App.css'
 import config from './config.json'
 import { useChainMetrics } from './hooks/useChainMetrics'
 import { ChainTablePanel } from './panels/ChainTablePanel'
+import { Footer } from './panels/Footer'
 import { HeroPanel } from './panels/HeroPanel'
 import { SupplyPanel } from './panels/SupplyPanel'
 
@@ -32,6 +33,7 @@ function App() {
         />
         <ChainTablePanel chains={config.chains} supplies={supplies} tokenSymbol={config.token.symbol} />
       </main>
+      <Footer />
     </div>
   )
 }
