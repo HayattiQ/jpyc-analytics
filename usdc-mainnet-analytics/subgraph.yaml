@@ -5,25 +5,22 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: FiatTokenProxy
+    name: FiatToken
     network: mainnet
     source:
       address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-      abi: FiatTokenProxy
+      abi: FiatToken
       startBlock: 23660000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - AdminChanged
-        - Upgraded
+        - Transfer
       abis:
-        - name: FiatTokenProxy
-          file: ./abis/FiatTokenProxy.json
+        - name: FiatToken
+          file: ./abis/FiatToken.json
       eventHandlers:
-        - event: AdminChanged(address,address)
-          handler: handleAdminChanged
-        - event: Upgraded(address)
-          handler: handleUpgraded
-      file: ./src/fiat-token-proxy.ts
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/fiat-token.ts
