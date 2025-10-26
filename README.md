@@ -57,7 +57,7 @@
 ## 9. 技術要件
 - **データ取り込み**: M0 は各チェーンのコントラクトから直接 RPC 読み取り。M1 以降は The Graph Subgraph を主要ソースとし、必要に応じて AMM API から板情報を pull。チェーン / サービスの登録は config ファイル (JSON/YAML) で管理し、DB は使用しない。
 - **フロントエンド**: Vite + pure React 18, TypeScript, Tailwind CSS, Recharts を利用。SSR は行わず SPA として配信し、Zustand で状態管理。
-- **バックエンド**: 必要最小限の Node.js (Fastify) プロキシで Subgraph / RPC へのアクセスとキャッシュを制御。永続データベースは持たず、短期キャッシュのみ（in-memory / CDN）。
+- **バックエンド**: 必要最小限の Node.jsプロキシで Subgraph / RPC へのアクセスとキャッシュを制御。永続データベースは持たず。bun を利用。
 - **データ管理**: 永続ストレージや RDBMS は使わず、config ファイルと外部データソースの組み合わせで構成。設定ファイルは Git 管理。
 - **CI/CD**: GitHub Actions + Terraform(or Pulumi) で IaC。main へのマージで自動デプロイ。
 - **監視**: OpenTelemetry + Grafana + PagerDuty、SLO 99.5%。

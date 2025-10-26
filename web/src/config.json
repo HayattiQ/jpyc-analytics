@@ -1,0 +1,45 @@
+{
+  "token": {
+    "symbol": "USDC",
+    "decimals": 6
+  },
+  "holderApi": {
+    "provider": "covalent",
+    "apiKey": "ckey_docs"
+  },
+  "chains": [
+    {
+      "id": "ethereum",
+      "name": "Ethereum",
+      "rpcUrl": "https://eth-mainnet.g.alchemy.com/v2/Peofv0-31TJjEYH8jPmOnFjRXtCdjMZ5",
+      "tokenAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "explorerBaseUrl": "https://etherscan.io/token/",
+      "holder": {
+        "covalentChainId": 1
+      },
+      "accent": "#627eea"
+    },
+    {
+      "id": "polygon",
+      "name": "Polygon",
+      "rpcUrl": "https://polygon-mainnet.g.alchemy.com/v2/Peofv0-31TJjEYH8jPmOnFjRXtCdjMZ5",
+      "tokenAddress": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+      "explorerBaseUrl": "https://polygonscan.com/token/",
+      "holder": {
+        "covalentChainId": 137
+      },
+      "accent": "#8247e5"
+    },
+    {
+      "id": "avalanche",
+      "name": "Avalanche",
+      "rpcUrl": "https://avalanche-public.nodies.app/ext/bc/C/rpc",
+      "tokenAddress": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+      "explorerBaseUrl": "https://snowtrace.io/token/",
+      "holder": {
+        "covalentChainId": 43114
+      },
+      "accent": "#e84142"
+    }
+  ]
+}
