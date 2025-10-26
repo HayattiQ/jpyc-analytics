@@ -9,9 +9,9 @@ export const HeroPanel = ({ lastUpdated, isLoading, onRefresh }: HeroPanelProps)
     <header className="hero">
       <div>
         <p className="eyebrow">M0 · Direct Contract Reads</p>
-        <h1>USDC Supply Monitor</h1>
+        <h1>JPYC Supply Monitor</h1>
         <p className="lede">
-          リアルタイムで Polygon / Avalanche / Ethereum の USDC 供給量を取得し、
+          リアルタイムで Polygon / Avalanche / Ethereum の JPYC 供給量を取得し、
           ひと目で比較できる横棒グラフにまとめました。
         </p>
       </div>
