@@ -1,6 +1,5 @@
 import config from '../config.json'
 import type { ChainMetrics } from '../hooks/useChainMetrics'
-import type { NormalizedDailyStat } from '../hooks/useSubgraphStats'
 
 const formatLabel = (date: Date) =>
   `${date.getMonth() + 1}/${date.getDate().toString().padStart(2, '0')}`
@@ -11,36 +10,56 @@ export type DailySeriesPoint = {
   [key: string]: string | number
 }
 
-const buildPoint = (date: Date, supplies: ChainMetrics[], totalSupply: number) => {
-  const point: DailySeriesPoint = {
-    label: formatLabel(date),
-    isoDate: date.toISOString().slice(0, 10)
-  }
-
-  const denominator = supplies.reduce((acc, chain) => acc + chain.supply, 0)
-  supplies.forEach((chain) => {
-    const ratio = denominator > 0 ? chain.supply / denominator : 1 / supplies.length
-    point[chain.name] = Number((totalSupply * ratio).toFixed(2))
-  })
-
-  return point
+export interface NormalizedDailyStat {
+  dayStartTimestamp: number
+  totalSupply: number
 }
 
-export const buildDailySeries = (
-  supplies: ChainMetrics[],
-  stats: NormalizedDailyStat[] = [],
-  days = 7
+export interface ChainDailySeries {
+  chainId: string
+  name: string
+  accent: string
+  stats: NormalizedDailyStat[]
+}
+
+const buildFromChainStats = (
+  chainStats: ChainDailySeries[],
+  days: number
 ): DailySeriesPoint[] => {
-  if (supplies.length === 0 || days <= 0) return []
+  const timestampSet = new Set<number>()
+  chainStats.forEach((chain) => {
+    chain.stats.forEach((stat) => timestampSet.add(stat.dayStartTimestamp))
+  })
 
-  if (stats.length > 0) {
-    const limited = stats.slice(-days)
-    return limited.map((stat) => {
-      const date = new Date(stat.dayStartTimestamp * 1000)
-      return buildPoint(date, supplies, stat.totalSupply)
+  const sortedTimestamps = Array.from(timestampSet).sort((a, b) => a - b)
+  const selected = sortedTimestamps.slice(-days)
+
+  if (selected.length === 0) return []
+
+  const chainMaps = chainStats.map((chain) => ({
+    name: chain.name,
+    data: new Map(
+      chain.stats.map((stat) => [stat.dayStartTimestamp, stat.totalSupply] as const)
+    )
+  }))
+
+  return selected.map((timestamp) => {
+    const date = new Date(timestamp * 1000)
+    const point: DailySeriesPoint = {
+      label: formatLabel(date),
+      isoDate: date.toISOString().slice(0, 10)
+    }
+
+    chainMaps.forEach((chain) => {
+      const value = chain.data.get(timestamp) ?? 0
+      point[chain.name] = Number(value.toFixed(2))
     })
-  }
 
+    return point
+  })
+}
+
+const buildSyntheticSeries = (supplies: ChainMetrics[], days: number): DailySeriesPoint[] => {
   const end = new Date()
   end.setHours(0, 0, 0, 0)
   const start = new Date(end)
@@ -72,4 +91,21 @@ export const buildDailySeries = (
   }
 
   return points
+}
+
+export const buildDailySeries = (
+  supplies: ChainMetrics[],
+  chainStats: ChainDailySeries[] = [],
+  days = 7
+): DailySeriesPoint[] => {
+  if (supplies.length === 0 || days <= 0) return []
+
+  if (chainStats.length > 0) {
+    const series = buildFromChainStats(chainStats, days)
+    if (series.length > 0) {
+      return series
+    }
+  }
+
+  return buildSyntheticSeries(supplies, days)
 }

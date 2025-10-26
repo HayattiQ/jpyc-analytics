@@ -1,10 +1,10 @@
 import './App.css'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import config from './config.json'
 import { buildDailySeries } from './lib/dailySeries'
 import { useChainMetrics } from './hooks/useChainMetrics'
+import { useSubgraphDailyStats } from './hooks/useSubgraphDailyStats'
 import { useSubgraphGlobalStats } from './hooks/useSubgraphGlobalStats'
-import { useSubgraphStats } from './hooks/useSubgraphStats'
 import { ChainTablePanel } from './panels/ChainTablePanel'
 import { DailySupplyPanel } from './panels/DailySupplyPanel'
 import { Footer } from './panels/Footer'
@@ -23,7 +23,11 @@ function App() {
     reload,
     isInitialLoading
   } = useChainMetrics()
-  const { dailyStats, loading: statsLoading } = useSubgraphStats(7)
+  const {
+    chainStats: chainDailyStats,
+    loading: dailyStatsLoading,
+    reload: reloadDailyStats
+  } = useSubgraphDailyStats(7)
   const {
     globalStats,
     loading: globalStatsLoading,
@@ -32,8 +36,8 @@ function App() {
   } = useSubgraphGlobalStats()
 
   const dailySeries = useMemo(
-    () => buildDailySeries(supplies, dailyStats, 7),
-    [supplies, dailyStats]
+    () => buildDailySeries(supplies, chainDailyStats, 7),
+    [supplies, chainDailyStats]
   )
 
   const holderChartData = useMemo(
@@ -54,9 +58,15 @@ function App() {
     [globalStats]
   )
 
+  const handleRefresh = useCallback(() => {
+    reload()
+    reloadGlobalStats()
+    reloadDailyStats()
+  }, [reload, reloadDailyStats, reloadGlobalStats])
+
   return (
     <div className="app-shell">
-      <HeroPanel lastUpdated={lastUpdated} isLoading={isInitialLoading} onRefresh={reload} />
+      <HeroPanel lastUpdated={lastUpdated} isLoading={isInitialLoading} onRefresh={handleRefresh} />
       <main className="content">
         <SupplyPanel
           tokenSymbol={config.token.symbol}
@@ -69,7 +79,7 @@ function App() {
         />
         <DailySupplyPanel
           data={dailySeries}
-          isLoading={isInitialLoading || (statsLoading && dailySeries.length === 0)}
+          isLoading={dailyStatsLoading && dailySeries.length === 0}
         />
         <HolderPanel
           data={holderChartData}

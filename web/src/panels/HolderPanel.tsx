@@ -36,7 +36,7 @@ export const HolderPanel = ({
       <div className="panel-header">
         <div>
           <h2>チェーン別ホルダー数</h2>
-          <p className="panel-subtitle">Subgraph から取得した最新ホルダー数を比率で按分表示</p>
+          <p className="panel-subtitle">各チェーンごとのリアルタイムでのJPYCホルダー数情報</p>
         </div>
         <div className="total">
           <span>Total</span>

@@ -1,26 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
+import type { ChainDailySeries } from '../lib/dailySeries'
 
 const TOKEN_DECIMALS = 10 ** config.token.decimals
 const SUPPORTED_CHAIN_IDS = ['ethereum', 'polygon', 'avalanche'] as const
 
-interface SubgraphGlobalStat {
-  holderCount: string
+interface SubgraphDailyStat {
+  dayStartTimestamp: string
   totalSupply: string
-  updatedAtTimestamp?: string
 }
 
-export interface ChainGlobalStat {
-  chainId: string
-  name: string
-  accent: string
-  holderCount: number
-  totalSupply: number
-  updatedAt: number
-}
+export interface ChainDailyStatsResult extends ChainDailySeries {}
 
-export const useSubgraphGlobalStats = () => {
-  const [globalStats, setGlobalStats] = useState<ChainGlobalStat[]>([])
+export const useSubgraphDailyStats = (days = 7) => {
+  const [chainStats, setChainStats] = useState<ChainDailyStatsResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,7 +32,7 @@ export const useSubgraphGlobalStats = () => {
 
   const normalizeSupply = (value: string) => Number(value) / TOKEN_DECIMALS
 
-  const fetchGlobalStats = useCallback(async () => {
+  const fetchDailyStats = useCallback(async () => {
     setLoading(true)
     setError(null)
 
@@ -55,15 +48,14 @@ export const useSubgraphGlobalStats = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               query: `
-                query GlobalStat($id: ID!) {
-                  globalStat(id: $id) {
-                    holderCount
+                query DailyStats($days: Int!) {
+                  dailyStats(first: $days, orderBy: dayStartTimestamp, orderDirection: desc) {
+                    dayStartTimestamp
                     totalSupply
-                    updatedAtTimestamp
                   }
                 }
               `,
-              variables: { id: chain.globalStatId }
+              variables: { days }
             })
           })
 
@@ -72,51 +64,48 @@ export const useSubgraphGlobalStats = () => {
           }
 
           const payload = (await response.json()) as {
-            data?: { globalStat?: SubgraphGlobalStat | null }
+            data?: { dailyStats?: SubgraphDailyStat[] }
             errors?: { message: string }[]
           }
-          console.log(payload,targetChains)
 
           if (payload.errors && payload.errors.length > 0) {
             throw new Error(payload.errors[0].message)
           }
 
-          const stat = payload.data?.globalStat
-
-          if (!stat) {
-            throw new Error(`globalStat が取得できません (${chain.name})`)
-          }
+          const normalizedStats =
+            payload.data?.dailyStats?.map((stat) => ({
+              dayStartTimestamp: Number(stat.dayStartTimestamp),
+              totalSupply: normalizeSupply(stat.totalSupply)
+            })) ?? []
 
           return {
             chainId: chain.id,
             name: chain.name,
             accent: chain.accent,
-            holderCount: Number(stat.holderCount),
-            totalSupply: normalizeSupply(stat.totalSupply),
-            updatedAt: Number(stat.updatedAtTimestamp ?? 0)
+            stats: normalizedStats.sort((a, b) => a.dayStartTimestamp - b.dayStartTimestamp)
           }
         })
       )
 
-      setGlobalStats(stats)
+      setChainStats(stats)
     } catch (err) {
-      setGlobalStats([])
+      setChainStats([])
       setError((err as Error).message)
     } finally {
       setLoading(false)
     }
-  }, [targetChains])
+  }, [days, targetChains])
 
   useEffect(() => {
-    void fetchGlobalStats()
-  }, [fetchGlobalStats])
+    void fetchDailyStats()
+  }, [fetchDailyStats])
 
   const reload = useCallback(() => {
-    void fetchGlobalStats()
-  }, [fetchGlobalStats])
+    void fetchDailyStats()
+  }, [fetchDailyStats])
 
   return {
-    globalStats,
+    chainStats,
     loading,
     error,
     reload
