@@ -1,9 +1,11 @@
 import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import { Transfer as TransferEvent } from "../generated/FiatToken/FiatToken"
-import { Account, GlobalStat, Transfer } from "../generated/schema"
+import { Account, DailyStat, GlobalStat, Transfer } from "../generated/schema"
 
 const ZERO_ADDRESS = Address.zero()
 const ONE = BigInt.fromI32(1)
+const SECONDS_PER_DAY = 60 * 60 * 24
+const STAT_ID = Bytes.fromUTF8("global")
 
 function loadOrCreateAccount(address: Address): Account {
   let account = Account.load(address)
@@ -17,11 +19,35 @@ function loadOrCreateAccount(address: Address): Account {
 }
 
 function loadOrCreateGlobalStat(): GlobalStat {
-  let statId = Bytes.fromUTF8("global")
-  let stat = GlobalStat.load(statId)
+  let stat = GlobalStat.load(STAT_ID)
   if (stat == null) {
-    stat = new GlobalStat(statId)
+    stat = new GlobalStat(STAT_ID)
     stat.holderCount = BigInt.zero()
+    stat.totalSupply = BigInt.zero()
+    stat.updatedAtBlock = BigInt.zero()
+    stat.updatedAtTimestamp = BigInt.zero()
+  }
+  return stat
+}
+
+function getDayStartTimestamp(timestamp: BigInt): BigInt {
+  let day = timestamp.toI64() / SECONDS_PER_DAY
+  return BigInt.fromI64(day * SECONDS_PER_DAY as i64)
+}
+
+function getDayId(timestamp: BigInt): string {
+  let day = timestamp.toI64() / SECONDS_PER_DAY
+  return day.toString()
+}
+
+function loadOrCreateDailyStat(timestamp: BigInt): DailyStat {
+  let dayId = getDayId(timestamp)
+  let stat = DailyStat.load(dayId)
+  if (stat == null) {
+    stat = new DailyStat(dayId)
+    stat.dayStartTimestamp = getDayStartTimestamp(timestamp)
+    stat.holderCount = BigInt.zero()
+    stat.totalSupply = BigInt.zero()
     stat.updatedAtBlock = BigInt.zero()
     stat.updatedAtTimestamp = BigInt.zero()
   }
@@ -43,8 +69,10 @@ export function handleTransfer(event: TransferEvent): void {
   entity.save()
 
   let stat = loadOrCreateGlobalStat()
+  let minted = event.params.from.equals(ZERO_ADDRESS)
+  let burned = event.params.to.equals(ZERO_ADDRESS)
 
-  if (event.params.from.notEqual(ZERO_ADDRESS)) {
+  if (!minted) {
     let fromAccount = loadOrCreateAccount(event.params.from)
     let previousBalance = fromAccount.balance
     fromAccount.balance = previousBalance.minus(event.params.value)
@@ -59,7 +87,7 @@ export function handleTransfer(event: TransferEvent): void {
     fromAccount.save()
   }
 
-  if (event.params.to.notEqual(ZERO_ADDRESS)) {
+  if (!burned) {
     let toAccount = loadOrCreateAccount(event.params.to)
     let previousBalance = toAccount.balance
     toAccount.balance = previousBalance.plus(event.params.value)
@@ -74,7 +102,23 @@ export function handleTransfer(event: TransferEvent): void {
     toAccount.save()
   }
 
+  if (minted) {
+    stat.totalSupply = stat.totalSupply.plus(event.params.value)
+  } else if (burned) {
+    stat.totalSupply = stat.totalSupply.minus(event.params.value)
+  }
+
   stat.updatedAtBlock = event.block.number
   stat.updatedAtTimestamp = event.block.timestamp
   stat.save()
+
+  let daily = loadOrCreateDailyStat(event.block.timestamp)
+  daily.holderCount = stat.holderCount
+  daily.totalSupply = stat.totalSupply
+  daily.updatedAtBlock = event.block.number
+  daily.updatedAtTimestamp = event.block.timestamp
+  if (daily.dayStartTimestamp.equals(BigInt.zero())) {
+    daily.dayStartTimestamp = getDayStartTimestamp(event.block.timestamp)
+  }
+  daily.save()
 }

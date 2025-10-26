@@ -18,6 +18,16 @@ type Account @entity(immutable: false) {
 type GlobalStat @entity(immutable: false) {
   id: Bytes!
   holderCount: BigInt!
+  totalSupply: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+}
+
+type DailyStat @entity(immutable: false) {
+  id: String!
+  dayStartTimestamp: BigInt!
+  holderCount: BigInt!
+  totalSupply: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTimestamp: BigInt!
 }
