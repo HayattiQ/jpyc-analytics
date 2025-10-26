@@ -30,7 +30,6 @@ export const HolderPanel = ({
   errorMessage,
   onRetry
 }: HolderPanelProps) => {
-  console.log(data,total)
   return (
     <section className="panel">
       <div className="panel-header">

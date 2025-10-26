@@ -75,7 +75,6 @@ export const useSubgraphGlobalStats = () => {
             data?: { globalStat?: SubgraphGlobalStat | null }
             errors?: { message: string }[]
           }
-          console.log(payload,targetChains)
 
           if (payload.errors && payload.errors.length > 0) {
             throw new Error(payload.errors[0].message)
