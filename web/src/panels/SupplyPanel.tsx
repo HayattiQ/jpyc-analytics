@@ -33,8 +33,7 @@ export const SupplyPanel = ({
   <section className="panel">
     <div className="panel-header">
       <div>
-        <h2>チェーン別供給量</h2>
-        <p className="panel-subtitle">直接 RPC から totalSupply() を呼び出して取得</p>
+        <h2> リアルタイム チェーン別 発行量</h2>
       </div>
       <div className="total">
         <span>Total</span>

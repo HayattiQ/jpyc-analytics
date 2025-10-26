@@ -1,18 +1,15 @@
 export const Footer = () => (
   <footer className="app-footer">
-    <div>
-      <strong>JPYC Analytics MVP</strong>
-      <span> · コントラクト直接 read / 60 秒更新</span>
+    <div className="footer-brand">
+      <span>Powered by <a href="https://x.com/HayattiQ">HayattiQ</a></span>
     </div>
-    <div className="footer-meta">
-      <span>Built with React + Vite + Recharts</span>
-      <a
-        href="https://github.com/HayattiQ/jpyc-analytics"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        GitHub
-      </a>
-    </div>
+    <a
+      className="footer-github"
+      href="https://github.com/HayattiQ/jpyc-analytics"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      GitHub
+    </a>
   </footer>
 )
