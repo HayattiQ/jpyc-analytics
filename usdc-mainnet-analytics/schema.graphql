@@ -7,3 +7,17 @@ type Transfer @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type Account @entity(immutable: false) {
+  id: Bytes!
+  balance: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+}
+
+type GlobalStat @entity(immutable: false) {
+  id: Bytes!
+  holderCount: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+}
