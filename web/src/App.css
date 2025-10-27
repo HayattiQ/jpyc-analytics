@@ -302,6 +302,12 @@ tbody tr:last-of-type td {
     flex-direction: column;
   }
 
+  /* モバイル時に total を右端に揃える */
+  .panel-header .total {
+    align-self: flex-end;
+    text-align: right;
+  }
+
   .app-footer {
     flex-direction: column;
     align-items: flex-start;
