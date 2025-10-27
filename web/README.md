@@ -1,73 +1,25 @@
-# React + TypeScript + Vite
+# JPYC Analytics (Web)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+このフォルダは Vite + React のフロントエンドです。
 
-Currently, two official plugins are available:
+## メタ/OG/Twitter
+- タイトル/説明/OG/Twitter メタは `web/index.html` に定義しています。
+- 既定の OG 画像は `web/public/ogimage2.png`（1200x675, PNG）を参照します。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 時価総額入りの動的OG画像（SVG）生成
+依存ゼロのスクリプトで SVG を生成できます。価格と供給量から時価総額を描画します。
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+実行例:
+```
+PRICE=1.02 SUPPLY=100000000 node ../scripts/generate-og.mjs
+# または
+node ../scripts/generate-og.mjs --price 1.02 --supply 100000000
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+出力: `web/public/og.svg`（既存ファイルを上書き）。本番は静的 `ogimage2.png` を利用中。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+メモ:
+- 画像はSNS側で強くキャッシュされることがあります。更新の即時反映が必要な場合はファイル名にバージョンを付与（例: `ogimage2-v2.png`）し、`index.html` の参照先を更新してください。
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+注記:
+- X(Twitter) など一部プラットフォームは SVG の `og:image` を安定表示しない場合があります。最終的には同デザインの PNG を用意することを推奨します（サーバレス関数やスケジュールジョブで PNG 生成/更新）。

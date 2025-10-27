@@ -95,3 +95,13 @@
 - Config ファイルの構造（JSON / YAML）とデプロイプロセスでの管理方法。
 - AMM / Orderbook API の優先プロトコル選定とレート制限ハンドリング。
 - 公開 API のキャッシュ戦略（CDN / Edge）と更新間隔。
+
+## 16. メタ/OG/SNS 共有
+- タイトル/OG/Twitter メタは `web/index.html` に定義。
+- 既定の OG 画像は `web/public/ogimage2.png`（静的PNG 1200x675）。
+- Twitter/X 等でのカード表示最適化のため、比率は 1.78:1（1200x675）を採用。
+
+参考: 動的 OG（将来の選択肢）
+- サーバレス関数（例: Vercel Edge）でPNGをオンデマンド生成。
+- GitHub Actions で定期実行し、価格API + 供給量からPNGを生成して `web/public/ogimage2.png` を更新。
+- リポジトリには依存ゼロの `scripts/generate-og.mjs`（SVG生成）も同梱。PNG化に差し替え可能。
