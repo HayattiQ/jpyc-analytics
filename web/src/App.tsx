@@ -1,5 +1,5 @@
 import './App.css'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import config from './config.json'
 import { buildDailySeries } from './lib/dailySeries'
 import { useChainMetrics } from './hooks/useChainMetrics'
@@ -25,8 +25,7 @@ function App() {
   } = useChainMetrics()
   const {
     chainStats: chainDailyStats,
-    loading: dailyStatsLoading,
-    reload: reloadDailyStats
+    loading: dailyStatsLoading
   } = useSubgraphDailyStats(7)
   const {
     globalStats,
@@ -58,15 +57,9 @@ function App() {
     [globalStats]
   )
 
-  const handleRefresh = useCallback(() => {
-    reload()
-    reloadGlobalStats()
-    reloadDailyStats()
-  }, [reload, reloadDailyStats, reloadGlobalStats])
-
   return (
     <div className="app-shell">
-      <HeroPanel lastUpdated={lastUpdated} isLoading={isInitialLoading} onRefresh={handleRefresh} />
+      <HeroPanel lastUpdated={lastUpdated} isLoading={isInitialLoading} />
       <main className="content">
         <SupplyPanel
           tokenSymbol={config.token.symbol}

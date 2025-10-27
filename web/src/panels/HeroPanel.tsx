@@ -1,10 +1,9 @@
 interface HeroPanelProps {
   lastUpdated: Date | null
   isLoading: boolean
-  onRefresh: () => void
 }
 
-export const HeroPanel = ({ lastUpdated, isLoading, onRefresh }: HeroPanelProps) => {
+export const HeroPanel = ({ lastUpdated, isLoading }: HeroPanelProps) => {
   return (
     <header className="hero">
       <div>
@@ -24,7 +23,12 @@ export const HeroPanel = ({ lastUpdated, isLoading, onRefresh }: HeroPanelProps)
               ? '読み込み中…'
               : '—'}
         </div>
-        <button type="button" onClick={onRefresh} disabled={isLoading}>
+        <button
+          type="button"
+          className="ghost-button"
+          onClick={() => window.location.reload()}
+          disabled={isLoading}
+        >
           更新
         </button>
       </div>
