@@ -58,35 +58,51 @@ export const SupplyPanel = ({
         <div className="skeleton" aria-hidden />
       ) : (
         <ResponsiveContainer width="100%" height={320}>
-          <BarChart
-            data={sortedSupplies}
-            layout="vertical"
-            margin={{ top: 8, right: 24, bottom: 8, left: 80 }}
-          >
-            <CartesianGrid strokeDasharray="4 4" horizontal vertical={false} />
-            <XAxis
-              type="number"
-              tickFormatter={(value) => `${(value / 1_000_000_000).toFixed(1)}B`}
-              stroke="var(--muted)"
-            />
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={100}
-              axisLine={false}
-              tickLine={false}
-              stroke="var(--muted)"
-            />
-            <Tooltip
-              cursor={{ fill: 'var(--surface-hover)' }}
-              formatter={(value: number) => formatSupplyUnits(value, tokenSymbol)}
-            />
-            <Bar dataKey="supply" radius={[0, 8, 8, 0]}>
-              {sortedSupplies.map((entry) => (
-                <Cell key={entry.chainId} fill={entry.accent} />
-              ))}
-            </Bar>
-          </BarChart>
+          {(() => {
+            const maxValue = sortedSupplies.reduce((m, c) => Math.max(m, c.supply), 0)
+            const units = [
+              { value: 1_000_000_000_000, suffix: 'T' },
+              { value: 1_000_000_000, suffix: 'B' },
+              { value: 1_000_000, suffix: 'M' },
+              { value: 1_000, suffix: 'K' }
+            ] as const
+            const picked = units.find((u) => maxValue >= u.value)
+            const divisor = picked ? picked.value : 1
+            const suffix = picked ? picked.suffix : ''
+            const formatTick = (value: number) => `${(value / divisor).toFixed(1)}${suffix}`
+
+            return (
+              <BarChart
+                data={sortedSupplies}
+                layout="vertical"
+                margin={{ top: 8, right: 24, bottom: 8, left: 80 }}
+              >
+                <CartesianGrid strokeDasharray="4 4" horizontal vertical={false} />
+                <XAxis
+                  type="number"
+                  tickFormatter={formatTick}
+                  stroke="var(--muted)"
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={100}
+                  axisLine={false}
+                  tickLine={false}
+                  stroke="var(--muted)"
+                />
+                <Tooltip
+                  cursor={{ fill: 'var(--surface-hover)' }}
+                  formatter={(value: number) => formatSupplyUnits(value, tokenSymbol)}
+                />
+                <Bar dataKey="supply" radius={[0, 8, 8, 0]}>
+                  {sortedSupplies.map((entry) => (
+                    <Cell key={entry.chainId} fill={entry.accent} />
+                  ))}
+                </Bar>
+              </BarChart>
+            )
+          })()}
         </ResponsiveContainer>
       )}
     </div>
