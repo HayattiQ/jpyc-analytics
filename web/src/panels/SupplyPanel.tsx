@@ -70,12 +70,16 @@ export const SupplyPanel = ({
             const divisor = picked ? picked.value : 1
             const suffix = picked ? picked.suffix : ''
             const formatTick = (value: number) => `${(value / divisor).toFixed(1)}${suffix}`
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480
+            const leftMargin = isMobile ? 24 : 40
+            const rightMargin = isMobile ? 8 : 16
+            const yAxisWidth = isMobile ? 64 : 80
 
             return (
               <BarChart
                 data={sortedSupplies}
                 layout="vertical"
-                margin={{ top: 8, right: 24, bottom: 8, left: 80 }}
+                margin={{ top: 8, right: rightMargin, bottom: 8, left: leftMargin }}
               >
                 <CartesianGrid strokeDasharray="4 4" horizontal vertical={false} />
                 <XAxis
@@ -83,14 +87,14 @@ export const SupplyPanel = ({
                   tickFormatter={formatTick}
                   stroke="var(--muted)"
                 />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={100}
-                  axisLine={false}
-                  tickLine={false}
-                  stroke="var(--muted)"
-                />
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={yAxisWidth}
+              axisLine={false}
+              tickLine={false}
+              stroke="var(--muted)"
+            />
                 <Tooltip
                   cursor={{ fill: 'var(--surface-hover)' }}
                   formatter={(value: number) => formatSupplyUnits(value, tokenSymbol)}
