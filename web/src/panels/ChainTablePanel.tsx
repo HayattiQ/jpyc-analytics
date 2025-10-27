@@ -1,12 +1,10 @@
-import type { ChainMetrics, ChainConfig } from '../hooks/useChainMetrics'
+import type { ChainConfig } from '../hooks/useChainMetrics'
 
 interface ChainTablePanelProps {
   chains: ChainConfig[]
-  supplies: ChainMetrics[]
-  tokenSymbol: string
 }
 
-export const ChainTablePanel = ({ chains, supplies, tokenSymbol }: ChainTablePanelProps) => (
+export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
   <section className="panel table-panel">
     <div className="panel-header">
       <div>
@@ -21,16 +19,20 @@ export const ChainTablePanel = ({ chains, supplies, tokenSymbol }: ChainTablePan
         <thead>
           <tr>
             <th>チェーン</th>
-            <th>供給量 ({tokenSymbol})</th>
+            <th>Issuer</th>
             <th>ホルダー数</th>
             <th>コントラクトアドレス</th>
           </tr>
         </thead>
         <tbody>
           {chains.map((chain) => {
-            const matched = supplies.find((item) => item.chainId === chain.id)
             const explorerHref = chain.explorerBaseUrl
               ? `${chain.explorerBaseUrl}${chain.tokenAddress}`
+              : null
+            const issuerAddress = (chain as { issuerAddress?: string }).issuerAddress
+            const issuerExplorerHref = (chain as { explorerAddressBaseUrl?: string })
+              .explorerAddressBaseUrl
+              ? `${(chain as { explorerAddressBaseUrl?: string }).explorerAddressBaseUrl}${issuerAddress}`
               : null
             return (
               <tr key={chain.id}>
@@ -43,7 +45,24 @@ export const ChainTablePanel = ({ chains, supplies, tokenSymbol }: ChainTablePan
                     {chain.name}
                   </div>
                 </td>
-                <td>{matched ? matched.formattedSupply : '—'}</td>
+                <td>
+                  {issuerAddress ? (
+                    issuerExplorerHref ? (
+                      <a
+                        className="contract-link"
+                        href={issuerExplorerHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {issuerAddress}
+                      </a>
+                    ) : (
+                      <span className="contract-address">{issuerAddress}</span>
+                    )
+                  ) : (
+                    '—'
+                  )}
+                </td>
                 <td> **** </td>
                 <td>
                   {explorerHref ? (

@@ -13,7 +13,9 @@
       "name": "Ethereum",
       "rpcUrl": "https://eth-mainnet.g.alchemy.com/v2/Peofv0-31TJjEYH8jPmOnFjRXtCdjMZ5",
       "tokenAddress": "0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29",
+      "issuerAddress": "0x8549e82239a88f463ab6e55ad1895b629a00def3",
       "explorerBaseUrl": "https://etherscan.io/token/",
+      "explorerAddressBaseUrl": "https://etherscan.io/address/",
       "subgraphUrl": "https://api.studio.thegraph.com/query/64060/usdc-mainnet-analytics/version/latest",
       "globalStatId": "0x676c6f62616c",
       "accent": "#627eea"
@@ -23,7 +25,9 @@
       "name": "Polygon",
       "rpcUrl": "https://polygon-mainnet.g.alchemy.com/v2/Peofv0-31TJjEYH8jPmOnFjRXtCdjMZ5",
       "tokenAddress": "0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29",
+      "issuerAddress": "0x8549e82239a88f463ab6e55ad1895b629a00def3",
       "explorerBaseUrl": "https://polygonscan.com/token/",
+      "explorerAddressBaseUrl": "https://polygonscan.com/address/",
       "subgraphUrl": "https://api.studio.thegraph.com/query/64060/usdc-mainnet-analytics/version/latest",
       "globalStatId": "0x676c6f62616c",
       "accent": "#8247e5"
@@ -33,7 +37,9 @@
       "name": "Avalanche",
       "rpcUrl": "https://avalanche-public.nodies.app/ext/bc/C/rpc",
       "tokenAddress": "0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29",
+      "issuerAddress": "0x8549e82239a88f463ab6e55ad1895b629a00def3",
       "explorerBaseUrl": "https://snowtrace.io/token/",
+      "explorerAddressBaseUrl": "https://snowtrace.io/address/",
       "subgraphUrl": "https://api.studio.thegraph.com/query/64060/usdc-mainnet-analytics/version/latest",
       "globalStatId": "0x676c6f62616c",
       "accent": "#e84142"

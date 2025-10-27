@@ -83,7 +83,7 @@ function App() {
             onRetry={reloadGlobalStats}
           />
         </div>
-        <ChainTablePanel chains={config.chains} supplies={supplies} tokenSymbol={config.token.symbol} />
+        <ChainTablePanel chains={config.chains} />
       </main>
       <Footer />
     </div>

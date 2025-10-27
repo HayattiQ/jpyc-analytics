@@ -17,6 +17,7 @@ export interface ChainMetrics {
 }
 
 const TOTAL_SUPPLY_SELECTOR = '0x18160ddd'
+const BALANCE_OF_SELECTOR = '0x70a08231'
 
 const buildRpcPayload = (chain: ChainConfig) => ({
   jsonrpc: '2.0',
@@ -26,6 +27,25 @@ const buildRpcPayload = (chain: ChainConfig) => ({
     {
       to: chain.tokenAddress,
       data: TOTAL_SUPPLY_SELECTOR
+    },
+    'latest'
+  ]
+})
+
+const encodeBalanceOfData = (address: string) => {
+  const addr = address.toLowerCase().replace(/^0x/, '')
+  const padded = addr.padStart(64, '0')
+  return `${BALANCE_OF_SELECTOR}${padded}`
+}
+
+const buildBalanceOfPayload = (chain: ChainConfig, holder: string) => ({
+  jsonrpc: '2.0',
+  id: `${chain.id}-balance-of-${holder}`,
+  method: 'eth_call',
+  params: [
+    {
+      to: chain.tokenAddress,
+      data: encodeBalanceOfData(holder)
     },
     'latest'
   ]
@@ -69,7 +89,31 @@ export const useChainMetrics = () => {
       throw new Error(`Empty RPC result for ${chain.name}`)
     }
 
-    return normalizeSupply(body.result, config.token.decimals)
+    const totalSupply = normalizeSupply(body.result, config.token.decimals)
+
+    const issuer = (chain as { issuerAddress?: string }).issuerAddress
+    if (!issuer) return totalSupply
+
+    const balRes = await fetch(chain.rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildBalanceOfPayload(chain, issuer))
+    })
+
+    if (!balRes.ok) {
+      throw new Error(`RPC error (balanceOf ${chain.name}): ${balRes.status}`)
+    }
+
+    const balBody = (await balRes.json()) as { result?: string; error?: { message?: string } }
+    if (balBody.error) {
+      throw new Error(balBody.error.message ?? `Unknown RPC error for balanceOf ${chain.name}`)
+    }
+    if (!balBody.result) {
+      throw new Error(`Empty RPC result for balanceOf ${chain.name}`)
+    }
+
+    const issuerBalance = normalizeSupply(balBody.result, config.token.decimals)
+    return Math.max(totalSupply - issuerBalance, 0)
   }, [])
 
   const fetchHolderCount = useCallback(async (chain: ChainConfig) => {
