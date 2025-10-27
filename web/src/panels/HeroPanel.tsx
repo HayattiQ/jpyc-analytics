@@ -24,6 +24,9 @@ export const HeroPanel = ({ lastUpdated, isLoading, onRefresh }: HeroPanelProps)
               ? '読み込み中…'
               : '—'}
         </div>
+        <button type="button" onClick={onRefresh} disabled={isLoading}>
+          更新
+        </button>
       </div>
     </header>
   )

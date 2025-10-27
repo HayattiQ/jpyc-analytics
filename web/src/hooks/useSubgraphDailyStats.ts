@@ -10,7 +10,7 @@ interface SubgraphDailyStat {
   totalSupply: string
 }
 
-export interface ChainDailyStatsResult extends ChainDailySeries {}
+export type ChainDailyStatsResult = ChainDailySeries
 
 export const useSubgraphDailyStats = (days = 7) => {
   const [chainStats, setChainStats] = useState<ChainDailyStatsResult[]>([])
