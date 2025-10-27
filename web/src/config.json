@@ -1,7 +1,7 @@
 {
   "token": {
     "symbol": "JPYC",
-    "decimals": 6
+    "decimals": 18
   },
   "holderApi": {
     "provider": "covalent",

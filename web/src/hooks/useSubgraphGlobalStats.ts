@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
-
-const TOKEN_DECIMALS = 10 ** config.token.decimals
 const SUPPORTED_CHAIN_IDS = ['ethereum', 'polygon', 'avalanche'] as const
 
 interface SubgraphGlobalStat {
@@ -37,7 +35,13 @@ export const useSubgraphGlobalStats = () => {
     []
   )
 
-  const normalizeSupply = (value: string) => Number(value) / TOKEN_DECIMALS
+  const normalizeSupply = (value: string) => {
+    const raw = BigInt(value)
+    const divisor = 10n ** BigInt(config.token.decimals)
+    const integerPart = Number(raw / divisor)
+    const fractionPart = Number(raw % divisor) / Number(divisor)
+    return integerPart + fractionPart
+  }
 
   const fetchGlobalStats = useCallback(async () => {
     setLoading(true)
