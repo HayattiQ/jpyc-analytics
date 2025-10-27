@@ -12,7 +12,7 @@ export const ChainTablePanel = ({ chains, supplies, tokenSymbol }: ChainTablePan
       <div>
         <h2>チェーン別 JPYC 情報</h2>
         <p className="panel-subtitle">
-          config.json のコントラクトアドレスと供給量・ホルダー数を表形式で一覧化
+          コントラクトアドレスや供給量・ホルダー数を表形式で一覧化
         </p>
       </div>
     </div>
@@ -44,7 +44,7 @@ export const ChainTablePanel = ({ chains, supplies, tokenSymbol }: ChainTablePan
                   </div>
                 </td>
                 <td>{matched ? matched.formattedSupply : '—'}</td>
-                <td>{matched ? matched.formattedHolderCount : '—'}</td>
+                <td> **** </td>
                 <td>
                   {explorerHref ? (
                     <a

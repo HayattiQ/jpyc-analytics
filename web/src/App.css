@@ -81,6 +81,12 @@
   gap: 1.5rem;
 }
 
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
 .panel {
   background-color: var(--surface);
   border-radius: 1.25rem;
@@ -136,6 +142,17 @@
 
 .chart-wrapper {
   height: 340px;
+}
+
+.panel--compact .coming-soon-placeholder {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border);
+  border-radius: 0.9rem;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .table-panel .panel-header {
@@ -275,6 +292,10 @@ tbody tr:last-of-type td {
 
   .panel {
     padding: 1.25rem;
+  }
+
+  .panel-grid {
+    grid-template-columns: 1fr;
   }
 
   .panel-header {

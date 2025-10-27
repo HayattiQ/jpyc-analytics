@@ -77,17 +77,19 @@ function App() {
           onRetry={reload}
           isInitialLoading={isInitialLoading}
         />
-        <DailySupplyPanel
-          data={dailySeries}
-          isLoading={dailyStatsLoading && dailySeries.length === 0}
-        />
-        <HolderPanel
-          data={holderChartData}
-          total={holderTotal}
-          isLoading={globalStatsLoading}
-          errorMessage={globalStatsError}
-          onRetry={reloadGlobalStats}
-        />
+        <div className="panel-grid">
+          <DailySupplyPanel
+            data={dailySeries}
+            isLoading={dailyStatsLoading && dailySeries.length === 0}
+          />
+          <HolderPanel
+            data={holderChartData}
+            total={holderTotal}
+            isLoading={globalStatsLoading}
+            errorMessage={globalStatsError}
+            onRetry={reloadGlobalStats}
+          />
+        </div>
         <ChainTablePanel chains={config.chains} supplies={supplies} tokenSymbol={config.token.symbol} />
       </main>
       <Footer />
