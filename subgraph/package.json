@@ -1,0 +1,27 @@
+{
+  "name": "jpyc-analytics-subgraph",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ jpyc-ethereum-analytics",
+    "codegen:ethereum": "graph codegen subgraph.yaml",
+    "build:ethereum": "graph build subgraph.yaml",
+    "deploy:ethereum": "graph deploy --node https://api.studio.thegraph.com/deploy/ jpyc-ethereum-analytics subgraph.yaml",
+    "codegen:polygon": "graph codegen subgraph.polygon.yaml",
+    "build:polygon": "graph build subgraph.polygon.yaml",
+    "deploy:polygon": "graph deploy --node https://api.studio.thegraph.com/deploy/ jpyc-polygon-analytics subgraph.polygon.yaml",
+    "codegen:avalanche": "graph codegen subgraph.avalanche.yaml",
+    "build:avalanche": "graph build subgraph.avalanche.yaml",
+    "deploy:avalanche": "graph deploy --node https://api.studio.thegraph.com/deploy/ jpyc-avalanche-analytics subgraph.avalanche.yaml",
+    "create-local": "graph create --node http://localhost:8020/ jpyc-ethereum-analytics",
+    "remove-local": "graph remove --node http://localhost:8020/ jpyc-ethereum-analytics",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 jpyc-ethereum-analytics",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.98.1",
+    "@graphprotocol/graph-ts": "0.37.0"
+  },
+  "devDependencies": { "matchstick-as": "0.6.0" }
+}

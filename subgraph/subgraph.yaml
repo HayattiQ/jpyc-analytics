@@ -8,9 +8,10 @@ dataSources:
     name: FiatToken
     network: mainnet
     source:
-      address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      # JPYC(Ethereum) のコントラクトアドレス（web/src/config.json に合わせる）
+      address: "0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29"
       abi: FiatToken
-      startBlock: 23660000
+      startBlock: 23666340
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9

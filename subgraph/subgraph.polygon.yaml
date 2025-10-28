@@ -1,0 +1,27 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: FiatToken
+    network: polygon
+    source:
+      # JPYC(Polygon) アドレス（web/src/config.json に合わせる）
+      address: "0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29"
+      abi: FiatToken
+      startBlock: 78216847
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Transfer
+      abis:
+        - name: FiatToken
+          file: ./abis/FiatToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/fiat-token.ts
