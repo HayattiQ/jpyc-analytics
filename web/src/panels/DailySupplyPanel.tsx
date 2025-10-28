@@ -18,10 +18,11 @@ interface DailySupplyPanelProps {
 }
 
 export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({ data, isLoading }) => {
-  const valueKey = 'Ethereum'
-  const eth = config.chains.find((c) => c.id === 'ethereum')
-  const accent = eth?.accent ?? '#627eea'
   const tokenSymbol = config.token.symbol
+  // 表示対象: Ethereum + Polygon の2系列
+  const series = config.chains
+    .filter((c) => c.id === 'ethereum' || c.id === 'polygon')
+    .map((c) => ({ name: c.name, accent: c.accent }))
 
   return (
     <section className="panel panel--compact">
@@ -36,7 +37,10 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({ data, isLoading })
         ) : (
           <ResponsiveContainer width="100%" height={320}>
             {(() => {
-              const maxValue = data.reduce((m, p) => Math.max(m, Number(p[valueKey] ?? 0)), 0)
+              const maxValue = data.reduce((m, p) => {
+                const sum = series.reduce((acc, s) => acc + Number(p[s.name] ?? 0), 0)
+                return Math.max(m, sum)
+              }, 0)
               const units = [
                 { value: 1_000_000_000_000, suffix: 'T' },
                 { value: 1_000_000_000, suffix: 'B' },
@@ -67,7 +71,15 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({ data, isLoading })
                       return iso ?? label
                     }}
                   />
-                  <Bar dataKey={valueKey} stackId="total" fill={accent} radius={[4, 4, 0, 0]} />
+                  {series.map((s, idx) => (
+                    <Bar
+                      key={s.name}
+                      dataKey={s.name}
+                      stackId="total"
+                      fill={s.accent}
+                      radius={idx === series.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                    />
+                  ))}
                 </BarChart>
               )
             })()}

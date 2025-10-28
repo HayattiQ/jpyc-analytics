@@ -12,8 +12,6 @@ dataSources:
       address: "0xE7C3D8C9a439feDe00D2600032D5dB0Be71C3c29"
       abi: FiatToken
       startBlock: 23666340
-    context:
-      issuer: "0x8549e82239a88f463ab6e55ad1895b629a00def3"
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
