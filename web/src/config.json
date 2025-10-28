@@ -3,10 +3,6 @@
     "symbol": "JPYC",
     "decimals": 18
   },
-  "holderApi": {
-    "provider": "covalent",
-    "apiKey": "ckey_docs"
-  },
   "chains": [
     {
       "id": "ethereum",
