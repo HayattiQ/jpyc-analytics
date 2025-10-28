@@ -16,7 +16,7 @@
       "issuerAddress": "0x8549e82239a88f463ab6e55ad1895b629a00def3",
       "explorerBaseUrl": "https://etherscan.io/token/",
       "explorerAddressBaseUrl": "https://etherscan.io/address/",
-      "subgraphUrl": "https://api.studio.thegraph.com/query/64060/usdc-mainnet-analytics/version/latest",
+      "subgraphUrl": "https://api.studio.thegraph.com/query/64060/jpyc-ethereum-analytics/0.0.2",
       "globalStatId": "0x676c6f62616c",
       "startBlock": "23666340",
       "accent": "#627eea"

@@ -23,10 +23,15 @@ function App() {
     reload,
     isInitialLoading
   } = useChainMetrics()
+  const ETH_START = Math.floor(Date.parse('2025-10-27T00:00:00Z') / 1000)
+  const daysFromStart = Math.max(
+    1,
+    Math.floor(Date.now() / 1000 - ETH_START) / 86400 + 1
+  )
   const {
     chainStats: chainDailyStats,
     loading: dailyStatsLoading
-  } = useSubgraphDailyStats(7)
+  } = useSubgraphDailyStats(0, ETH_START)
   const {
     globalStats,
     loading: globalStatsLoading,
@@ -34,10 +39,10 @@ function App() {
     reload: reloadGlobalStats
   } = useSubgraphGlobalStats()
 
-  const dailySeries = useMemo(
-    () => buildDailySeries(supplies, chainDailyStats, 7),
-    [supplies, chainDailyStats]
-  )
+  const dailySeries = useMemo(() => {
+    const ethOnly = chainDailyStats.filter((cs) => cs.chainId === 'ethereum')
+    return buildDailySeries(supplies, ethOnly, Math.floor(daysFromStart))
+  }, [supplies, chainDailyStats, daysFromStart])
 
   const holderChartData = useMemo(
     () =>

@@ -11,7 +11,7 @@ interface SubgraphDailyStat {
 
 export type ChainDailyStatsResult = ChainDailySeries
 
-export const useSubgraphDailyStats = (days = 7) => {
+export const useSubgraphDailyStats = (days = 7, fromTimestamp?: number) => {
   const [chainStats, setChainStats] = useState<ChainDailyStatsResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -48,20 +48,36 @@ export const useSubgraphDailyStats = (days = 7) => {
 
       const stats = await Promise.all(
         targetChains.map(async (chain) => {
-          const response = await fetch(chain.subgraphUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: `
+          const hasFrom = typeof fromTimestamp === 'number' && fromTimestamp > 0
+          const query = hasFrom
+            ? `
+                query DailyStatsFrom($from: BigInt!) {
+                  dailyStats(
+                    first: 1000,
+                    where: { dayStartTimestamp_gte: $from },
+                    orderBy: dayStartTimestamp,
+                    orderDirection: asc
+                  ) {
+                    dayStartTimestamp
+                    totalSupply
+                  }
+                }
+              `
+            : `
                 query DailyStats($days: Int!) {
                   dailyStats(first: $days, orderBy: dayStartTimestamp, orderDirection: desc) {
                     dayStartTimestamp
                     totalSupply
                   }
                 }
-              `,
-              variables: { days }
-            })
+              `
+
+          const variables = hasFrom ? { from: String(fromTimestamp) } : { days }
+
+          const response = await fetch(chain.subgraphUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, variables })
           })
 
           if (!response.ok) {
@@ -99,7 +115,7 @@ export const useSubgraphDailyStats = (days = 7) => {
     } finally {
       setLoading(false)
     }
-  }, [days, targetChains])
+  }, [days, fromTimestamp, targetChains])
 
   useEffect(() => {
     void fetchDailyStats()

@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
+import { Address, BigInt, Bytes, dataSource } from "@graphprotocol/graph-ts"
 import { Transfer as TransferEvent } from "../generated/FiatToken/FiatToken"
 import { Account, DailyStat, GlobalStat, Transfer } from "../generated/schema"
 
@@ -6,6 +6,17 @@ const ZERO_ADDRESS = Address.zero()
 const ONE = BigInt.fromI32(1)
 const SECONDS_PER_DAY = 60 * 60 * 24
 const STAT_ID = Bytes.fromUTF8("global")
+
+function getIssuerAddress(): Address {
+  // subgraph.yaml の dataSources[].context.issuer を優先
+  const ctx = dataSource.context()
+  const issuer = ctx.getString("issuer")
+  if (issuer) {
+    return Address.fromString(issuer as string)
+  }
+  // フォールバック: 既定のissuer（web/src/config.json と同一）
+  return Address.fromString("0x8549e82239a88f463ab6e55ad1895b629a00def3")
+}
 
 function loadOrCreateAccount(address: Address): Account {
   let account = Account.load(address)
@@ -114,7 +125,13 @@ export function handleTransfer(event: TransferEvent): void {
 
   let daily = loadOrCreateDailyStat(event.block.timestamp)
   daily.holderCount = stat.holderCount
-  daily.totalSupply = stat.totalSupply
+  // 循環供給量 = 総発行量 - issuer 残高
+  let issuerAccount = loadOrCreateAccount(getIssuerAddress())
+  let circulating = stat.totalSupply.minus(issuerAccount.balance)
+  if (circulating.lt(BigInt.zero())) {
+    circulating = BigInt.zero()
+  }
+  daily.totalSupply = circulating
   daily.updatedAtBlock = event.block.number
   daily.updatedAtTimestamp = event.block.timestamp
   if (daily.dayStartTimestamp.equals(BigInt.zero())) {
