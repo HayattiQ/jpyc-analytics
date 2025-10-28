@@ -1,15 +1,8 @@
 import type { FC } from 'react'
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis
-} from 'recharts'
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import config from '../config.json'
 import type { DailySeriesPoint } from '../lib/dailySeries'
+import { numberFormatter } from '../lib/format'
 
 interface HolderPanelProps {
   data: DailySeriesPoint[]
@@ -34,22 +27,18 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
         ) : (
           <ResponsiveContainer width="100%" height={320}>
             {(() => {
-              const maxValue = data.reduce((m, p) => {
-                const sum = series.reduce((acc, s) => acc + Number(p[s.name] ?? 0), 0)
-                return Math.max(m, sum)
-              }, 0)
-              const units = [
-                { value: 1_000_000_000, suffix: 'B' },
-                { value: 1_000_000, suffix: 'M' },
-                { value: 1_000, suffix: 'K' }
-              ] as const
-              const picked = units.find((u) => maxValue >= u.value)
-              const divisor = picked ? picked.value : 1
-              const suffix = picked ? picked.suffix : ''
-              const formatTick = (value: number) => `${Math.floor(value / divisor)}${suffix}`
               const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480
               const leftMargin = isMobile ? 24 : 40
               const rightMargin = isMobile ? 8 : 16
+
+              const step = 500
+              const maxTotal = data.reduce((m, p) => {
+                const sum = series.reduce((acc, s) => acc + Number(p[s.name] ?? 0), 0)
+                return Math.max(m, sum)
+              }, 0)
+              const maxTick = Math.max(step, Math.ceil(maxTotal / step) * step)
+              const tickCount = Math.floor(maxTick / step) + 1
+              const ticks = Array.from({ length: tickCount }, (_, i) => i * step)
 
               return (
                 <BarChart
@@ -58,9 +47,16 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
                 >
                   <CartesianGrid strokeDasharray="4 4" vertical={false} />
                   <XAxis dataKey="label" stroke="var(--muted)" />
-                  <YAxis tickFormatter={formatTick} stroke="var(--muted)" />
+                  <YAxis
+                    tickFormatter={(v) => numberFormatter.format(v)}
+                    allowDecimals={false}
+                    domain={[0, maxTick]}
+                    ticks={ticks}
+                    stroke="var(--muted)"
+                  />
                   <Tooltip
                     cursor={{ fill: 'var(--surface-hover)' }}
+                    formatter={(value: number) => numberFormatter.format(Math.floor(Number(value)))}
                     labelFormatter={(label: string, payload) => {
                       const iso = payload?.[0]?.payload?.isoDate as string | undefined
                       return iso ?? label
