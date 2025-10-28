@@ -12,7 +12,7 @@
       "issuerAddress": "0x8549e82239a88f463ab6e55ad1895b629a00def3",
       "explorerBaseUrl": "https://etherscan.io/token/",
       "explorerAddressBaseUrl": "https://etherscan.io/address/",
-      "subgraphUrl": "https://api.studio.thegraph.com/query/64060/jpyc-ethereum-analytics/0.0.2",
+      "subgraphUrl": "https://gateway.thegraph.com/api/subgraphs/id/4VHKVn3U9Zr9Mw2q6fzb6VkzQAY4zeA2MzCefV5o4Ygs",
       "globalStatId": "0x676c6f62616c",
       "startBlock": "23666340",
       "accent": "#627eea"
@@ -25,7 +25,7 @@
       "issuerAddress": "0x8549e82239a88f463ab6e55ad1895b629a00def3",
       "explorerBaseUrl": "https://polygonscan.com/token/",
       "explorerAddressBaseUrl": "https://polygonscan.com/address/",
-      "subgraphUrl": "https://api.studio.thegraph.com/query/64060/jpyc-polygon-analytics/0.0.2",
+      "subgraphUrl": "https://gateway.thegraph.com/api/subgraphs/id/2g8tfyQFYbAnRgskDRHkar3fRh4srEnKhu5nbRXdZFdB",
       "globalStatId": "0x676c6f62616c",
       "startBlock": "78216847",
       "accent": "#8247e5"
@@ -38,7 +38,7 @@
       "issuerAddress": "0x8549e82239a88f463ab6e55ad1895b629a00def3",
       "explorerBaseUrl": "https://snowtrace.io/token/",
       "explorerAddressBaseUrl": "https://snowtrace.io/address/",
-      "subgraphUrl": "https://api.studio.thegraph.com/query/64060/jpyc-avalanche-analytics/0.0.2",
+      "subgraphUrl": "https://gateway.thegraph.com/api/subgraphs/id/5UqZe8GkX1uQwPGxuPobHgp3PsprJrdvLTRDfyXMvJsX",
       "globalStatId": "0x676c6f62616c",
       "startBlock": "70965440",
       "accent": "#e84142"
