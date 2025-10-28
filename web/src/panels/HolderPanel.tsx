@@ -20,6 +20,18 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
         <div>
           <h2>日次ホルダー数</h2>
         </div>
+        {(() => {
+          const latest = data[data.length - 1]
+          const latestTotal = latest
+            ? series.reduce((acc, s) => acc + Number(latest[s.name] ?? 0), 0)
+            : 0
+          return (
+            <div className="total">
+              <span>Total</span>
+              <strong>{numberFormatter.format(Math.floor(latestTotal))}</strong>
+            </div>
+          )
+        })()}
       </div>
       <div className="chart-wrapper">
         {isLoading ? (
