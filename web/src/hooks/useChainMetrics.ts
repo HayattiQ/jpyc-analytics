@@ -146,7 +146,15 @@ export const useChainMetrics = () => {
     }
 
     if (payload.errors && payload.errors.length > 0) {
-      throw new Error(payload.errors[0].message)
+      const msg = payload.errors[0].message ?? 'Subgraph error'
+      // The Graph Studio returns `indexing_error` while indexing is in progress or failed.
+      // Treat it as temporarily unavailable and return null to avoid noisy logs.
+      if (msg.includes('indexing_error')) {
+        console.error(`[holderCount] ${chain.name}: indexing_error`)
+        return null
+      }
+      console.error(`[holderCount] ${chain.name}: ${msg}`)
+      throw new Error(msg)
     }
 
     const holderCount = payload.data?.globalStat?.holderCount
@@ -158,30 +166,61 @@ export const useChainMetrics = () => {
     setErrorMessage(null)
 
     try {
-      const values = await Promise.all(
+      const results = await Promise.all(
         config.chains.map(async (chain) => {
-          const [supply, holderCount] = await Promise.all([
-            fetchSupply(chain),
-            fetchHolderCount(chain).catch((error) => {
-              console.warn(error)
-              return null
-            })
-          ])
+          // Per-chain fetch with explicit logging
+          try {
+            const supply = await fetchSupply(chain)
+            let holderCount: number | null = null
+            try {
+              holderCount = await fetchHolderCount(chain)
+            } catch (e) {
+              console.error(`[holderCount] ${chain.name} failed: ${(e as Error).message}`)
+              holderCount = null
+            }
 
-          return {
-            chainId: chain.id,
-            name: chain.name,
-            supply,
-            formattedSupply: formatSupplyUnits(supply, config.token.symbol),
-            accent: chain.accent,
-            holderCount,
-            formattedHolderCount:
-              holderCount !== null ? numberFormatter.format(holderCount) : '—'
+            return {
+              ok: true as const,
+              chainId: chain.id,
+              name: chain.name,
+              supply,
+              formattedSupply: formatSupplyUnits(supply, config.token.symbol),
+              accent: chain.accent,
+              holderCount,
+              formattedHolderCount:
+                holderCount !== null ? numberFormatter.format(holderCount) : '—'
+            }
+          } catch (e) {
+            console.error(`[supply] ${chain.name} failed: ${(e as Error).message}`)
+            return { ok: false as const, chainId: chain.id, name: chain.name }
           }
         })
       )
 
-      setSupplies(values)
+      const ok = results.filter((r) => r.ok) as Array<
+        {
+          ok: true
+          chainId: string
+          name: string
+          supply: number
+          formattedSupply: string
+          accent: string
+          holderCount: number | null
+          formattedHolderCount: string
+        }
+      >
+      const failed = results.filter((r) => !r.ok).map((r) => r.name)
+
+      // Summary log
+      console.error(
+        `[useChainMetrics] summary ok=[${ok.map((r) => r.name).join(", ")}] failed=[${failed.join(", ")}]`
+      )
+
+      if (ok.length === 0) {
+        throw new Error('All chains failed to load')
+      }
+
+      setSupplies(ok)
       setStatus('success')
       setLastUpdated(new Date())
     } catch (error) {

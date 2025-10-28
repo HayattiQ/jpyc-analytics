@@ -13,6 +13,7 @@ export type DailySeriesPoint = {
 export interface NormalizedDailyStat {
   dayStartTimestamp: number
   totalSupply: number
+  holderCount?: number
 }
 
 export interface ChainDailySeries {
@@ -53,6 +54,42 @@ const buildFromChainStats = (
     chainMaps.forEach((chain) => {
       const value = chain.data.get(timestamp) ?? 0
       point[chain.name] = Number(value.toFixed(2))
+    })
+
+    return point
+  })
+}
+
+export const buildDailyHolderSeries = (
+  chainStats: ChainDailySeries[],
+  days: number
+): DailySeriesPoint[] => {
+  const timestampSet = new Set<number>()
+  chainStats.forEach((chain) => {
+    chain.stats.forEach((stat) => timestampSet.add(stat.dayStartTimestamp))
+  })
+
+  const sortedTimestamps = Array.from(timestampSet).sort((a, b) => a - b)
+  const selected = sortedTimestamps.slice(-days)
+  if (selected.length === 0) return []
+
+  const chainMaps = chainStats.map((chain) => ({
+    name: chain.name,
+    data: new Map(
+      chain.stats.map((stat) => [stat.dayStartTimestamp, stat.holderCount ?? 0] as const)
+    )
+  }))
+
+  return selected.map((timestamp) => {
+    const date = new Date(timestamp * 1000)
+    const point: DailySeriesPoint = {
+      label: formatLabel(date),
+      isoDate: date.toISOString().slice(0, 10)
+    }
+
+    chainMaps.forEach((chain) => {
+      const value = chain.data.get(timestamp) ?? 0
+      point[chain.name] = Math.max(0, Math.floor(Number(value)))
     })
 
     return point

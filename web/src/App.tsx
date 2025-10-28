@@ -1,10 +1,9 @@
 import './App.css'
 import { useMemo } from 'react'
 import config from './config.json'
-import { buildDailySeries } from './lib/dailySeries'
+import { buildDailyHolderSeries, buildDailySeries } from './lib/dailySeries'
 import { useChainMetrics } from './hooks/useChainMetrics'
 import { useSubgraphDailyStats } from './hooks/useSubgraphDailyStats'
-import { useSubgraphGlobalStats } from './hooks/useSubgraphGlobalStats'
 import { ChainTablePanel } from './panels/ChainTablePanel'
 import { DailySupplyPanel } from './panels/DailySupplyPanel'
 import { Footer } from './panels/Footer'
@@ -32,12 +31,7 @@ function App() {
     chainStats: chainDailyStats,
     loading: dailyStatsLoading
   } = useSubgraphDailyStats(0, ETH_START)
-  const {
-    globalStats,
-    loading: globalStatsLoading,
-    error: globalStatsError,
-    reload: reloadGlobalStats
-  } = useSubgraphGlobalStats()
+  // Holder の日次グラフは dailyStats を使用するため、globalStats は使用しない
 
   const dailySeries = useMemo(() => {
     const target = chainDailyStats.filter(
@@ -46,23 +40,12 @@ function App() {
     return buildDailySeries(supplies, target, Math.floor(daysFromStart))
   }, [supplies, chainDailyStats, daysFromStart])
 
-  const holderChartData = useMemo(
-    () =>
-      globalStats
-        .map((stat) => ({
-          chainId: stat.chainId,
-          name: stat.name,
-          accent: stat.accent,
-          holderCount: stat.holderCount
-        }))
-        .sort((a, b) => b.holderCount - a.holderCount),
-    [globalStats]
-  )
-
-  const holderTotal = useMemo(
-    () => globalStats.reduce((acc, stat) => acc + stat.holderCount, 0),
-    [globalStats]
-  )
+  const holderDailySeries = useMemo(() => {
+    const target = chainDailyStats.filter(
+      (cs) => cs.chainId === 'ethereum' || cs.chainId === 'polygon' || cs.chainId === 'avalanche'
+    )
+    return buildDailyHolderSeries(target, Math.floor(daysFromStart))
+  }, [chainDailyStats, daysFromStart])
 
   return (
     <div className="app-shell">
@@ -82,13 +65,7 @@ function App() {
             data={dailySeries}
             isLoading={dailyStatsLoading && dailySeries.length === 0}
           />
-          <HolderPanel
-            data={holderChartData}
-            total={holderTotal}
-            isLoading={globalStatsLoading}
-            errorMessage={globalStatsError}
-            onRetry={reloadGlobalStats}
-          />
+          <HolderPanel data={holderDailySeries} isLoading={dailyStatsLoading} />
         </div>
         <ChainTablePanel chains={config.chains} />
       </main>

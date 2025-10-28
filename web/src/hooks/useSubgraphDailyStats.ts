@@ -7,6 +7,7 @@ const SUPPORTED_CHAIN_IDS = ['ethereum', 'polygon', 'avalanche'] as const
 interface SubgraphDailyStat {
   dayStartTimestamp: string
   totalSupply: string
+  holderCount: string
 }
 
 export type ChainDailyStatsResult = ChainDailySeries
@@ -60,6 +61,7 @@ export const useSubgraphDailyStats = (days = 7, fromTimestamp?: number) => {
                   ) {
                     dayStartTimestamp
                     totalSupply
+                    holderCount
                   }
                 }
               `
@@ -68,6 +70,7 @@ export const useSubgraphDailyStats = (days = 7, fromTimestamp?: number) => {
                   dailyStats(first: $days, orderBy: dayStartTimestamp, orderDirection: desc) {
                     dayStartTimestamp
                     totalSupply
+                    holderCount
                   }
                 }
               `
@@ -96,7 +99,8 @@ export const useSubgraphDailyStats = (days = 7, fromTimestamp?: number) => {
           const normalizedStats =
             payload.data?.dailyStats?.map((stat) => ({
               dayStartTimestamp: Number(stat.dayStartTimestamp),
-              totalSupply: normalizeSupply(stat.totalSupply)
+              totalSupply: normalizeSupply(stat.totalSupply),
+              holderCount: Number(stat.holderCount)
             })) ?? []
 
           return {

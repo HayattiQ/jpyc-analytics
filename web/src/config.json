@@ -29,7 +29,7 @@
       "issuerAddress": "0x8549e82239a88f463ab6e55ad1895b629a00def3",
       "explorerBaseUrl": "https://polygonscan.com/token/",
       "explorerAddressBaseUrl": "https://polygonscan.com/address/",
-      "subgraphUrl": "https://api.studio.thegraph.com/query/64060/jpyc-polygon-analytics/0.0.1",
+      "subgraphUrl": "https://api.studio.thegraph.com/query/64060/jpyc-polygon-analytics/0.0.2",
       "globalStatId": "0x676c6f62616c",
       "startBlock": "78216847",
       "accent": "#8247e5"
