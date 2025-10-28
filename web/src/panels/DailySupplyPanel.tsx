@@ -19,16 +19,15 @@ interface DailySupplyPanelProps {
 
 export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({ data, isLoading }) => {
   const tokenSymbol = config.token.symbol
-  // 表示対象: Ethereum + Polygon の2系列
   const series = config.chains
-    .filter((c) => c.id === 'ethereum' || c.id === 'polygon')
+    .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
     .map((c) => ({ name: c.name, accent: c.accent }))
 
   return (
     <section className="panel panel--compact">
       <div className="panel-header">
         <div>
-          <h2>日次供給量（Ethereum）</h2>
+          <h2>日次供給量</h2>
         </div>
       </div>
       <div className="chart-wrapper">

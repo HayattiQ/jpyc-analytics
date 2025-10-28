@@ -40,7 +40,9 @@ function App() {
   } = useSubgraphGlobalStats()
 
   const dailySeries = useMemo(() => {
-    const target = chainDailyStats.filter((cs) => cs.chainId === 'ethereum' || cs.chainId === 'polygon')
+    const target = chainDailyStats.filter(
+      (cs) => cs.chainId === 'ethereum' || cs.chainId === 'polygon' || cs.chainId === 'avalanche'
+    )
     return buildDailySeries(supplies, target, Math.floor(daysFromStart))
   }, [supplies, chainDailyStats, daysFromStart])
 
