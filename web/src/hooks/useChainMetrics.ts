@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
 import { formatSupplyUnits, numberFormatter } from '../lib/format'
+import { buildGraphHeaders } from '../lib/graphHeaders'
 
 export type SupplyStatus = 'idle' | 'loading' | 'success' | 'error'
 
@@ -123,7 +124,7 @@ export const useChainMetrics = () => {
 
     const response = await fetch(chain.subgraphUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: buildGraphHeaders(),
       body: JSON.stringify({
         query: `
           query GlobalStat($id: ID!) {

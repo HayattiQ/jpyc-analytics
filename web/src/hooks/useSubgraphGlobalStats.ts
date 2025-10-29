@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
+import { buildGraphHeaders } from '../lib/graphHeaders'
 const SUPPORTED_CHAIN_IDS = ['ethereum', 'polygon', 'avalanche'] as const
 
 interface SubgraphGlobalStat {
@@ -56,7 +57,7 @@ export const useSubgraphGlobalStats = () => {
         targetChains.map(async (chain) => {
           const response = await fetch(chain.subgraphUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: buildGraphHeaders(),
             body: JSON.stringify({
               query: `
                 query GlobalStat($id: ID!) {
