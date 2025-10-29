@@ -9,9 +9,7 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
     <div className="panel-header">
       <div>
         <h2>チェーン別 JPYC 情報</h2>
-        <p className="panel-subtitle">
-          コントラクトアドレスや供給量・ホルダー数を表形式で一覧化
-        </p>
+        <p className="panel-subtitle">コントラクトアドレスや Issuer / Redeem を一覧化</p>
       </div>
     </div>
     <div className="table-wrapper">
@@ -20,7 +18,7 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
           <tr>
             <th>チェーン</th>
             <th>Issuer</th>
-            <th>ホルダー数</th>
+            <th>Redeem</th>
             <th>コントラクトアドレス</th>
           </tr>
         </thead>
@@ -33,6 +31,11 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
             const issuerExplorerHref = (chain as { explorerAddressBaseUrl?: string })
               .explorerAddressBaseUrl
               ? `${(chain as { explorerAddressBaseUrl?: string }).explorerAddressBaseUrl}${issuerAddress}`
+              : null
+            const redeemAddress = (chain as { redeemAddress?: string }).redeemAddress
+            const redeemExplorerHref = (chain as { explorerAddressBaseUrl?: string })
+              .explorerAddressBaseUrl
+              ? `${(chain as { explorerAddressBaseUrl?: string }).explorerAddressBaseUrl}${redeemAddress}`
               : null
             return (
               <tr key={chain.id}>
@@ -63,7 +66,24 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
                     '—'
                   )}
                 </td>
-                <td> **** </td>
+                <td>
+                  {redeemAddress ? (
+                    redeemExplorerHref ? (
+                      <a
+                        className="contract-link"
+                        href={redeemExplorerHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {redeemAddress}
+                      </a>
+                    ) : (
+                      <span className="contract-address">{redeemAddress}</span>
+                    )
+                  ) : (
+                    '—'
+                  )}
+                </td>
                 <td>
                   {explorerHref ? (
                     <a

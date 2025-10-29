@@ -13,7 +13,7 @@
       "redeemAddress": "0xb808af91bdc577bfb3f9c91470f3286dd076e5c1",
       "explorerBaseUrl": "https://etherscan.io/token/",
       "explorerAddressBaseUrl": "https://etherscan.io/address/",
-      "subgraphUrl": "https://api.studio.thegraph.com/query/64060/jpyc-ethereum-analytics/version/latest",
+      "subgraphUrl": "https://gateway.thegraph.com/api/subgraphs/id/4VHKVn3U9Zr9Mw2q6fzb6VkzQAY4zeA2MzCefV5o4Ygs",
       "globalStatId": "0x676c6f62616c",
       "startBlock": "23666340",
       "accent": "#627eea"
