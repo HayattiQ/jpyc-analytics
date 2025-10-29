@@ -92,29 +92,57 @@ export const useChainMetrics = () => {
 
     const totalSupply = normalizeSupply(body.result, config.token.decimals)
 
-    const issuer = (chain as { issuerAddress?: string }).issuerAddress
-    if (!issuer) return totalSupply
+    let circulating = totalSupply
 
-    const balRes = await fetch(chain.rpcUrl, {
+    const issuer = (chain as { issuerAddress?: string }).issuerAddress
+    if (issuer) {
+      const balRes = await fetch(chain.rpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildBalanceOfPayload(chain, issuer))
+      })
+
+      if (!balRes.ok) {
+        throw new Error(`RPC error (balanceOf ${chain.name}): ${balRes.status}`)
+      }
+
+      const balBody = (await balRes.json()) as { result?: string; error?: { message?: string } }
+      if (balBody.error) {
+        throw new Error(balBody.error.message ?? `Unknown RPC error for balanceOf ${chain.name}`)
+      }
+      if (!balBody.result) {
+        throw new Error(`Empty RPC result for balanceOf ${chain.name}`)
+      }
+
+      const issuerBalance = normalizeSupply(balBody.result, config.token.decimals)
+      circulating = Math.max(circulating - issuerBalance, 0)
+    }
+
+    // Subtract redeem address balance if provided (optional)
+    const redeem = (chain as { redeemAddress?: string }).redeemAddress
+    if (redeem) {
+      const redeemRes = await fetch(chain.rpcUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(buildBalanceOfPayload(chain, issuer))
-    })
-
-    if (!balRes.ok) {
-      throw new Error(`RPC error (balanceOf ${chain.name}): ${balRes.status}`)
+      body: JSON.stringify(buildBalanceOfPayload(chain, redeem))
+      })
+      if (!redeemRes.ok) {
+        throw new Error(`RPC error (balanceOf redeem ${chain.name}): ${redeemRes.status}`)
+      }
+      const redeemBody = (await redeemRes.json()) as { result?: string; error?: { message?: string } }
+      if (redeemBody.error) {
+        throw new Error(
+          redeemBody.error.message ?? `Unknown RPC error for balanceOf redeem ${chain.name}`
+        )
+      }
+      if (!redeemBody.result) {
+        throw new Error(`Empty RPC result for balanceOf redeem ${chain.name}`)
+      }
+      const redeemBalance = normalizeSupply(redeemBody.result, config.token.decimals)
+      circulating = Math.max(circulating - redeemBalance, 0)
     }
 
-    const balBody = (await balRes.json()) as { result?: string; error?: { message?: string } }
-    if (balBody.error) {
-      throw new Error(balBody.error.message ?? `Unknown RPC error for balanceOf ${chain.name}`)
-    }
-    if (!balBody.result) {
-      throw new Error(`Empty RPC result for balanceOf ${chain.name}`)
-    }
-
-    const issuerBalance = normalizeSupply(balBody.result, config.token.decimals)
-    return Math.max(totalSupply - issuerBalance, 0)
+    return circulating
   }, [])
 
   const fetchHolderCount = useCallback(async (chain: ChainConfig) => {
