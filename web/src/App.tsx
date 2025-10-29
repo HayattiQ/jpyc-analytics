@@ -1,14 +1,14 @@
 import './App.css'
 import { useMemo } from 'react'
 import config from './config.json'
-import { buildDailySeries } from './lib/dailySeries'
+import { buildDailyHolderSeries, buildDailySeries } from './lib/dailySeries'
 import { useChainMetrics } from './hooks/useChainMetrics'
 import { useSubgraphDailyStats } from './hooks/useSubgraphDailyStats'
 import { ChainTablePanel } from './panels/ChainTablePanel'
 import { DailySupplyPanel } from './panels/DailySupplyPanel'
 import { Footer } from './panels/Footer'
 import { HeroPanel } from './panels/HeroPanel'
-import { DailyHolderPiePanel } from './panels/DailyHolderPiePanel'
+import { HolderPanel } from './panels/HolderPanel'
 import { SupplyPanel } from './panels/SupplyPanel'
 
 function App() {
@@ -40,7 +40,12 @@ function App() {
     return buildDailySeries(supplies, target, Math.floor(daysFromStart))
   }, [supplies, chainDailyStats, daysFromStart])
 
-  // 日次ホルダー（円グラフ）はパネル内で最新値を取得するため未使用
+  const holderDailySeries = useMemo(() => {
+    const target = chainDailyStats.filter(
+      (cs) => cs.chainId === 'ethereum' || cs.chainId === 'polygon' || cs.chainId === 'avalanche'
+    )
+    return buildDailyHolderSeries(target, Math.floor(daysFromStart))
+  }, [chainDailyStats, daysFromStart])
 
   return (
     <div className="app-shell">
@@ -60,7 +65,7 @@ function App() {
             data={dailySeries}
             isLoading={dailyStatsLoading && dailySeries.length === 0}
           />
-          <DailyHolderPiePanel />
+          <HolderPanel data={holderDailySeries} isLoading={dailyStatsLoading} />
         </div>
         <ChainTablePanel chains={config.chains} />
       </main>
