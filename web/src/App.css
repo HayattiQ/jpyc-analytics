@@ -87,6 +87,18 @@
   gap: 1.5rem;
 }
 
+.panel-grid--thirds {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (min-width: 1024px) {
+  .panel-grid--thirds {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
 .panel {
   background-color: var(--surface);
   border-radius: 1.25rem;

@@ -10,6 +10,7 @@ import { Footer } from './panels/Footer'
 import { HeroPanel } from './panels/HeroPanel'
 import { HolderPanel } from './panels/HolderPanel'
 import { SupplyPanel } from './panels/SupplyPanel'
+import { ChainHolderBucketsPanel } from './panels/ChainHolderBucketsPanel'
 
 function App() {
   const {
@@ -66,6 +67,11 @@ function App() {
             isLoading={dailyStatsLoading && dailySeries.length === 0}
           />
           <HolderPanel data={holderDailySeries} isLoading={dailyStatsLoading} />
+        </div>
+        <div className="panel-grid panel-grid--thirds">
+          <ChainHolderBucketsPanel chainId="ethereum" />
+          <ChainHolderBucketsPanel chainId="polygon" />
+          <ChainHolderBucketsPanel chainId="avalanche" />
         </div>
         <ChainTablePanel chains={config.chains} />
       </main>

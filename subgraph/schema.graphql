@@ -19,8 +19,17 @@ type GlobalStat @entity(immutable: false) {
   id: Bytes!
   holderCount: BigInt!
   totalSupply: BigInt!
+  circulatingSupply: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTimestamp: BigInt!
+  # Holder buckets by balance (JPY, token decimals applied)
+  # Cumulative thresholds
+  holdersLe10k: BigInt!
+  holdersLe100k: BigInt!
+  holdersLe1m: BigInt!
+  holdersLe10m: BigInt!
+  # Greater than top threshold
+  holdersGt10m: BigInt!
 }
 
 type DailyStat @entity(immutable: false) {
@@ -30,4 +39,9 @@ type DailyStat @entity(immutable: false) {
   totalSupply: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTimestamp: BigInt!
+  holdersLe10k: BigInt!
+  holdersLe100k: BigInt!
+  holdersLe1m: BigInt!
+  holdersLe10m: BigInt!
+  holdersGt10m: BigInt!
 }
