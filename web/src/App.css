@@ -107,6 +107,10 @@
   box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
 }
 
+.panel--compact {
+  padding: 1.1rem;
+}
+
 .panel-header {
   display: flex;
   justify-content: space-between;
@@ -115,9 +119,17 @@
   margin-bottom: 1.5rem;
 }
 
+.panel--compact .panel-header {
+  margin-bottom: 0.9rem;
+}
+
 .panel-header h2 {
   margin: 0;
   font-size: 1.4rem;
+}
+
+.panel--compact .panel-header h2 {
+  font-size: 1.2rem;
 }
 
 .panel-subtitle {
@@ -139,6 +151,14 @@
   margin-top: 0.35rem;
 }
 
+.panel--compact .total {
+  font-size: 0.85rem;
+}
+
+.panel--compact .total strong {
+  font-size: 1.4rem;
+}
+
 .error-banner {
   border: 1px solid rgba(220, 38, 38, 0.3);
   background-color: var(--error-bg);
@@ -152,9 +172,33 @@
   margin-bottom: 1rem;
 }
 
-.chart-wrapper {
-  height: 340px;
+/* .chart-wrapper: let charts control their own height via ResponsiveContainer */
+
+.panel--compact .chart-wrapper {
+  height: 280px;
 }
+
+/* Buckets (holder amount ratio) specific compact style */
+.panel--bucket {
+  padding: 1.0rem;
+}
+
+.panel--bucket .panel-header {
+  margin-bottom: 0.5rem;
+}
+
+.panel--bucket .total strong {
+  font-size: 1.4rem;
+}
+
+/* allow chart to control its own height via ResponsiveContainer */
+
+/* Daily holders stacked bar: give more room to avoid clipping */
+.panel--holder .chart-wrapper {
+  height: 380px;
+}
+
+/* bucket-summary styles reverted */
 
 .panel--compact .coming-soon-placeholder {
   height: 180px;

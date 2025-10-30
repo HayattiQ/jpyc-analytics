@@ -15,7 +15,7 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
     .map((c) => ({ name: c.name, accent: c.accent }))
 
   return (
-    <section className="panel panel--compact">
+    <section className="panel panel--holder">
       <div className="panel-header">
         <div>
           <h2>日次ホルダー数</h2>
