@@ -1,4 +1,3 @@
-import './analytics.css'
 import { useMemo } from 'react'
 import config from '../config.json'
 import { buildDailyHolderSeries, buildDailySeries } from '../lib/dailySeries'
@@ -71,4 +70,3 @@ export function AnalyticsPage() {
     </div>
   )
 }
-
