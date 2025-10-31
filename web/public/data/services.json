@@ -6,15 +6,16 @@
       "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=doublejump.tokyo",
       "tags": ["法人", "ウォレット", "DeFi", "レンディング", "企業導入"],
       "description": "企業向けウォレット『N Suite』を基盤に、JPYCを活用したDeFiレンディング技術の法人導入を共同推進。企業がJPYCを保有・運用・レンディングに活用できる体制を検証。",
-      "url": "https://www.doublejump.tokyo/"
+      "url": "https://www.doublejump.tokyo/",
+      "pressUrl": "https://prtimes.jp/main/html/rd/p/000000279.000054018.html"
     },
     {
       "id": "undou-sapuri",
       "name": "運動サプリ（株式会社センス・イット・スマート）",
-      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=senseitsmart.co.jp",
+      "iconUrl": "https://logo.clearbit.com/espl.jp",
       "tags": ["ヘルスケア", "アプリ", "ウォレット", "決済"],
       "description": "行動変容型アプリ内ウォレットにJPYCを搭載。個人ユーザーはJPYC受取・送金、店舗はJPYC支払い受取が可能に。先着100名キャンペーンも実施。",
-      "url": "https://senseitsmart.co.jp/"
+      "url": "https://espl.jp"
     },
     {
       "id": "secured-finance",
@@ -22,7 +23,8 @@
       "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=secured.finance",
       "tags": ["DeFi", "レンディング", "固定金利", "金利ベンチマーク"],
       "description": "JPYC建ての固定金利レンディング市場、WBTC/ETH担保によるJPYC借入、オンチェーン円金利ベンチマーク構築など、JPYCを軸としたDeFiプロダクト群を発表。",
-      "url": "https://secured.finance/"
+      "url": "https://secured.finance/",
+      "pressUrl": "https://prtimes.jp/main/html/rd/p/000000001.000172212.html"
     },
     {
       "id": "liquid-elements",
@@ -43,18 +45,20 @@
     {
       "id": "cryptolinc",
       "name": "CryptoLinC（クリプト会計・損益計算）",
-      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=cryptact.com",
+      "iconUrl": "https://cryptolinc.com/favicon.ico",
       "tags": ["会計", "損益計算", "税務", "申告", "記帳"],
       "description": "JPYC対応を告知。履歴自動集計からP/L計算、申告・記帳までに活用可能。",
-      "url": "https://cryptolinc.com/"
+      "url": "https://cryptolinc.com/",
+      "pressUrl": "https://prtimes.jp/main/html/rd/p/000000281.000054018.html"
     },
     {
       "id": "densan-system",
       "name": "電算システム（65,000店超の決済網）",
-      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=densan-s.co.jp",
+      "iconUrl": "https://logo.clearbit.com/dsk-ec.jp",
       "tags": ["決済", "実店舗", "EC", "連携"],
       "description": "JPYC連携を発表。実店舗・ECの決済導入を想定。",
-      "url": "https://www.densan-s.co.jp/"
+      "url": "https://prtimes.jp/main/html/rd/p/000000278.000054018.html",
+      "pressUrl": "https://prtimes.jp/main/html/rd/p/000000278.000054018.html"
     },
     {
       "id": "asteria-warp",
@@ -70,7 +74,8 @@
       "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=hashport.io",
       "tags": ["ウォレット", "対応予定", "EXPO2025"],
       "description": "JPYC対応予定を明示。ユーザー導線の強化を示す。",
-      "url": "https://hashport.io/"
+      "url": "https://hashport.io/",
+      "pressUrl": "https://news.yahoo.co.jp/articles/7dc799b8df1107325c1bffdea71e984c5500fb02"
     },
     {
       "id": "bitget-wallet",
@@ -83,18 +88,19 @@
     {
       "id": "cryptact-pafin",
       "name": "クリプタクト（pafin）",
-      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=dex.woo.org",
+      "iconUrl": "https://www.cryptact.com/favicon.ico",
       "tags": ["会計", "損益計算", "税務", "申告", "記帳"],
       "description": "暗号資産の損益計算サービス『クリプタクト』がJPYCの損益計算に対応。履歴集計から申告・記帳まで活用可能。",
       "url": "https://cryptact.com/"
     },
     {
-      "id": "woo-dex",
-      "name": "WOO DEX",
-      "iconUrl": "/jpyc-icon.png",
-      "tags": ["DeFi", "DEX", "スワップ", "取引所"],
+      "id": "wowoo",
+      "name": "WOWOO",
+      "iconUrl": "",
+      "tags": ["SocialFi", "アプリ", "決済", "ウォレット"],
       "description": "日本初の円ステーブルコイン『JPYC』をWOWOO＆WOW Dexに導入決定",
-      "url": "https://dex.woo.org/"
+      "url": "https://nft-media.net/technology/jpyc-wowoo-wow-dex-introduction/83782/",
+      "pressUrl": "https://nft-media.net/technology/jpyc-wowoo-wow-dex-introduction/83782/"
     }
   ]
 }

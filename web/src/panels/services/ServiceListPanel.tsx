@@ -40,7 +40,7 @@ export function ServiceListPanel({ items, loading, onClickLink }: Props) {
                     className={hasUrl ? '' : 'pointer-events-none opacity-70'}
                     title={hasUrl ? undefined : 'リンクなし'}
                   >
-                    <ServiceIcon src={s.iconUrl} />
+                    <ServiceIcon src={s.iconUrl} showBrokenLabel={s.id === 'wowoo'} />
                   </a>
                   <a
                     href={href}
@@ -121,7 +121,7 @@ export function ServiceListPanel({ items, loading, onClickLink }: Props) {
                         className="inline-flex items-center"
                         title={hasUrl ? undefined : 'リンクなし'}
                       >
-                        <ServiceIcon src={s.iconUrl} />
+                        <ServiceIcon src={s.iconUrl} showBrokenLabel={s.id === 'wowoo'} />
                       </a>
                     </td>
                     <td className="py-2 px-2 border-b border-[var(--border)]">
@@ -157,4 +157,3 @@ export function ServiceListPanel({ items, loading, onClickLink }: Props) {
     </div>
   )
 }
-

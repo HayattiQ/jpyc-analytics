@@ -8,6 +8,7 @@ type ServiceItem = {
   tags: string[]
   description: string
   url?: string
+  pressUrl?: string
 }
 
 type ServicesFile = {
@@ -133,7 +134,22 @@ export function ServicesPage() {
                     </span>
                   ))}
                 </div>
-                <p className="m-0 text-sm text-slate-700">{s.description}</p>
+                <p className="m-0 text-sm text-slate-700">
+                  {s.description}
+                  {s.pressUrl && (
+                    <>
+                      {' '}
+                      <a
+                        href={s.pressUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[color:var(--accent)] hover:underline"
+                      >
+                        （プレスリリース）
+                      </a>
+                    </>
+                  )}
+                </p>
               </div>
             )
           })
@@ -221,6 +237,19 @@ export function ServicesPage() {
                     </td>
                     <td className="py-2 px-2 border-b border-[var(--border)]">
                       {s.description}
+                      {s.pressUrl && (
+                        <>
+                          {' '}
+                          <a
+                            href={s.pressUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[color:var(--accent)] hover:underline"
+                          >
+                            （プレスリリース）
+                          </a>
+                        </>
+                      )}
                     </td>
                   </tr>
                 )
