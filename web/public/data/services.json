@@ -1,53 +1,84 @@
 {
   "services": [
     {
-      "id": "payme",
-      "name": "PayMe",
-      "iconUrl": "https://example.com/icons/payme.png",
-      "tags": ["決済", "EC"],
-      "description": "EC 向けのシンプルな決済ゲートウェイ。JPYC に対応。",
-      "url": "https://payme.example.com"
+      "id": "doublejump-bifrost",
+      "name": "double jump.tokyo × Bifrost",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["法人", "ウォレット", "DeFi", "レンディング", "企業導入"],
+      "description": "企業向けウォレット『N Suite』を基盤に、JPYCを活用したDeFiレンディング技術の法人導入を共同推進。企業がJPYCを保有・運用・レンディングに活用できる体制を検証。",
+      "url": "https://www.doublejump.tokyo/"
     },
     {
-      "id": "game-verse",
-      "name": "GameVerse",
-      "iconUrl": "https://example.com/icons/gameverse.png",
-      "tags": ["ゲーム", "NFT"],
-      "description": "オンチェーン資産に対応したゲームプラットフォーム。",
-      "url": "https://gameverse.example.com"
+      "id": "undou-sapuri",
+      "name": "運動サプリ（株式会社センス・イット・スマート）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["ヘルスケア", "アプリ", "ウォレット", "決済"],
+      "description": "行動変容型アプリ内ウォレットにJPYCを搭載。個人ユーザーはJPYC受取・送金、店舗はJPYC支払い受取が可能に。先着100名キャンペーンも実施。",
+      "url": "https://senseitsmart.co.jp/"
     },
     {
-      "id": "donation-hub",
-      "name": "Donation Hub",
-      "iconUrl": "https://example.com/icons/donationhub.png",
-      "tags": ["寄付", "NPO"],
-      "description": "NPO 向け寄付ポータル。JPYC での寄付受付が可能。",
-      "url": "https://donation.example.org"
+      "id": "secured-finance",
+      "name": "Secured Finance",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["DeFi", "レンディング", "固定金利", "金利ベンチマーク"],
+      "description": "JPYC建ての固定金利レンディング市場、WBTC/ETH担保によるJPYC借入、オンチェーン円金利ベンチマーク構築など、JPYCを軸としたDeFiプロダクト群を発表。",
+      "url": "https://secured.finance/"
     },
     {
-      "id": "defi-earn",
-      "name": "DeFi Earn",
-      "iconUrl": "https://example.com/icons/defiearn.png",
-      "tags": ["DeFi", "利回り"],
-      "description": "利回り最適化のための自動運用ツール。",
-      "url": "https://defi-earn.example.com"
+      "id": "liquid-elements",
+      "name": "Liquid（ELEMENTSグループ）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["発行", "償還", "KYC", "JPKI", "プラットフォーム"],
+      "description": "JPYCの発行・償還プラットフォーム『JPYC EX』にて、マイナンバーカードICチップを使ったオンライン本人確認『JPKI』方式を導入。本人確認を強化。",
+      "url": "https://liquidinc.asia/jp/"
     },
     {
-      "id": "ticket-box",
-      "name": "Ticket Box",
-      "iconUrl": "https://example.com/icons/ticketbox.png",
-      "tags": ["チケット", "イベント"],
-      "description": "イベントチケット販売プラットフォーム。JPYC 決済に対応。",
-      "url": "https://ticketbox.example.com"
+      "id": "nudge-card",
+      "name": "Nudge（次世代クレカ）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["決済", "クレジットカード", "前払い", "後払い", "VISA"],
+      "description": "クレジットカード代金のJPYC払い（前払い／後払い）を10月開始予定と発表。VISA 加盟店での利用文脈も提示。",
+      "url": "https://nudge.works/"
     },
     {
-      "id": "wallety",
-      "name": "Wallety",
-      "iconUrl": "https://example.com/icons/wallety.png",
-      "tags": ["ウォレット", "ツール"],
-      "description": "初心者向けの軽量ウォレット。",
-      "url": "https://wallety.example.com"
+      "id": "cryptolinc",
+      "name": "CryptoLinC（クリプト会計・損益計算）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["会計", "損益計算", "税務", "申告", "記帳"],
+      "description": "JPYC対応を告知。履歴自動集計からP/L計算、申告・記帳までに活用可能。",
+      "url": "https://cryptolinc.com/"
+    },
+    {
+      "id": "densan-system",
+      "name": "電算システム（65,000店超の決済網）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["決済", "実店舗", "EC", "連携"],
+      "description": "JPYC連携を発表。実店舗・ECの決済導入を想定。",
+      "url": "https://www.densan-s.co.jp/"
+    },
+    {
+      "id": "asteria-warp",
+      "name": "ASTERIA Warp（ノーコード連携）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["ノーコード", "連携", "アダプター", "業務システム"],
+      "description": "JPYCアダプターの追加を発表。各種業務システムとの連携を想定。",
+      "url": "https://www.asteria.com/jp/warp/"
+    },
+    {
+      "id": "hashport-wallet",
+      "name": "HashPort Wallet（EXPO2025デジタルウォレット刷新）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["ウォレット", "対応予定", "EXPO2025"],
+      "description": "JPYC対応予定を明示。ユーザー導線の強化を示す。",
+      "url": "https://hashport.io/"
+    },
+    {
+      "id": "bitget-wallet",
+      "name": "Bitget Wallet（案内記事）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["ウォレット", "ハウツー", "スワップ", "保管"],
+      "description": "JPYCの保管・スワップ等の利用導線を解説したユーザー向けハウツーを提示。",
+      "url": "https://www.bitget.com/ja/how-to-buy/wallet/jpy-coin-eth"
     }
   ]
 }
-

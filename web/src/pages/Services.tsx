@@ -15,16 +15,14 @@ type ServicesFile = {
 }
 
 type SortDir = 'asc' | 'desc'
-type TagMode = 'AND' | 'OR'
 
 export function ServicesPage() {
   const [data, setData] = useState<ServiceItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [tagFilter, setTagFilter] = useState<string[]>([])
+  // タグUIは一旦非表示のため、フィルタは使用しない
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
-  const tagMode: TagMode = 'AND'
 
   useEffect(() => {
     let mounted = true
@@ -42,25 +40,16 @@ export function ServicesPage() {
     }
   }, [])
 
-  const allTags = useMemo(() => {
-    const set = new Set<string>()
-    for (const s of data) for (const t of s.tags) set.add(t)
-    return Array.from(set).sort((a, b) => a.localeCompare(b))
-  }, [data])
+  // タグのユニークリスト生成は現状未使用
 
   const filtered = useMemo(() => {
-    const byTags = (s: ServiceItem) => {
-      if (tagFilter.length === 0) return true
-      return tagMode === 'AND'
-        ? tagFilter.every((t) => s.tags.includes(t))
-        : tagFilter.some((t) => s.tags.includes(t))
-    }
-    const out = data.filter((s) => byTags(s))
+    // タグフィルタは無効化（全件対象）
+    const out = [...data]
     out.sort((a, b) =>
       sortDir === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
     )
     return out
-  }, [data, tagFilter, tagMode, sortDir])
+  }, [data, sortDir])
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const current = Math.min(page, pageCount)
@@ -68,11 +57,9 @@ export function ServicesPage() {
 
   useEffect(() => {
     setPage(1)
-  }, [tagFilter, tagMode, pageSize])
+  }, [pageSize])
 
-  const toggleTag = (t: string) => () => {
-    setTagFilter((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]))
-  }
+  // タグトグルは不要
 
   const onClickLink = (url?: string) => (e: React.MouseEvent) => {
     if (!url) e.preventDefault()
@@ -81,55 +68,23 @@ export function ServicesPage() {
   return (
     <main className="content flex flex-col gap-4">
       <section className="panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)] p-4 md:p-5">
-      {/* Controls */}
-      <section className="services__controls flex flex-col gap-3 my-2">
-        <div className="flex flex-wrap gap-2 items-center">
-          <div className="services__tags flex flex-wrap gap-2">
-            {allTags.map((t) => (
-              <button
-                key={t}
-                onClick={toggleTag(t)}
-                className={[
-                  'px-2 py-1 rounded-full border text-sm',
-                  tagFilter.includes(t)
-                    ? 'bg-blue-50 border-blue-300'
-                    : 'bg-transparent border-[var(--border)]'
-                ].join(' ')}
-                aria-pressed={tagFilter.includes(t)}
-              >
-                {t}
-              </button>
+      {/* Controls: 件数とページサイズのみ */}
+      <section className="services__controls flex items-center justify-between my-2 text-sm">
+        <div>
+          件数: <strong>{filtered.length}</strong>
+        </div>
+        <label className="flex items-center gap-2">
+          <span className="text-[color:var(--muted)]">表示件数</span>
+          <select
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+            className="border border-[var(--border)] rounded px-2 py-1 bg-[var(--surface)]"
+          >
+            {[10, 20, 50].map((n) => (
+              <option key={n} value={n}>{n}</option>
             ))}
-          </div>
-          {tagFilter.length > 0 && (
-            <button
-              className="ml-auto text-sm text-[color:var(--accent)] hover:underline"
-              onClick={() => setTagFilter([])}
-            >
-              フィルターをクリア
-            </button>
-          )}
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <div>
-            件数: <strong>{filtered.length}</strong>
-            {tagFilter.length > 0 && (
-              <span className="ml-2 text-[color:var(--muted)]">選択タグ: {tagFilter.join(', ')}</span>
-            )}
-          </div>
-          <label className="flex items-center gap-2">
-            <span className="text-[color:var(--muted)]">表示件数</span>
-            <select
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-              className="border border-[var(--border)] rounded px-2 py-1 bg-[var(--surface)]"
-            >
-              {[10, 20, 50].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </label>
-        </div>
+          </select>
+        </label>
       </section>
 
       {/* Mobile cards */}
