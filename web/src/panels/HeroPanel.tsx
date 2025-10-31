@@ -7,10 +7,9 @@ export const HeroPanel = ({ lastUpdated, isLoading }: HeroPanelProps) => {
   return (
     <header className="hero flex justify-between gap-8 items-start">
       <div>
-        <h1 className="m-0 text-4xl leading-tight font-bold">JPYC Analytics</h1>
+        <h1 className="m-0 text-4xl leading-tight font-bold">JPYC Info</h1>
         <p className="lede mt-3 text-slate-700 max-w-[720px]">
-          リアルタイムで JPYC のオンチェーン情報を取得し、
-          ひと目で比較できるグラフにまとめました。
+          JPYC のオンチェーン情報や、掲載サービスなど、お役立ち情報をまとめました。<br />
           Powered by <a className="text-[color:var(--accent)] font-semibold" href="https://x.com/HayattiQ">HayattiQ</a>
         </p>
       </div>

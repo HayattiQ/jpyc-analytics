@@ -12,7 +12,77 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
         <p className="panel-subtitle">コントラクトアドレスや Issuer / Redeem を一覧化</p>
       </div>
     </div>
-    <div className="table-wrapper w-full overflow-x-auto">
+
+    {/* モバイル: カード型 */}
+    <div className="md:hidden space-y-3">
+      {chains.map((chain) => {
+        const explorerHref = chain.explorerBaseUrl
+          ? `${chain.explorerBaseUrl}${chain.tokenAddress}`
+          : null
+        const issuerAddress = (chain as { issuerAddress?: string }).issuerAddress
+        const issuerExplorerHref = (chain as { explorerAddressBaseUrl?: string })
+          .explorerAddressBaseUrl
+          ? `${(chain as { explorerAddressBaseUrl?: string }).explorerAddressBaseUrl}${issuerAddress}`
+          : null
+        const redeemAddress = (chain as { redeemAddress?: string }).redeemAddress
+        const redeemExplorerHref = (chain as { explorerAddressBaseUrl?: string })
+          .explorerAddressBaseUrl
+          ? `${(chain as { explorerAddressBaseUrl?: string }).explorerAddressBaseUrl}${redeemAddress}`
+          : null
+
+        return (
+          <div key={chain.id} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+            <div className="flex items-center gap-2 font-semibold mb-2">
+              <span className="w-[10px] h-[10px] inline-block rounded-full" style={{ backgroundColor: chain.accent }} />
+              {chain.name}
+            </div>
+            <div className="text-sm grid grid-cols-1 gap-1">
+              <div>
+                <span className="text-[color:var(--muted)] mr-2">Issuer:</span>
+                {issuerAddress ? (
+                  issuerExplorerHref ? (
+                    <a className="text-[color:var(--accent)] font-semibold break-all" href={issuerExplorerHref} target="_blank" rel="noopener noreferrer">
+                      {issuerAddress}
+                    </a>
+                  ) : (
+                    <span className="font-mono break-all">{issuerAddress}</span>
+                  )
+                ) : (
+                  '—'
+                )}
+              </div>
+              <div>
+                <span className="text-[color:var(--muted)] mr-2">Redeem:</span>
+                {redeemAddress ? (
+                  redeemExplorerHref ? (
+                    <a className="text-[color:var(--accent)] font-semibold break-all" href={redeemExplorerHref} target="_blank" rel="noopener noreferrer">
+                      {redeemAddress}
+                    </a>
+                  ) : (
+                    <span className="font-mono break-all">{redeemAddress}</span>
+                  )
+                ) : (
+                  '—'
+                )}
+              </div>
+              <div>
+                <span className="text-[color:var(--muted)] mr-2">Contract:</span>
+                {explorerHref ? (
+                  <a className="text-[color:var(--accent)] font-semibold break-all" href={explorerHref} target="_blank" rel="noopener noreferrer">
+                    {chain.tokenAddress}
+                  </a>
+                ) : (
+                  <span className="font-mono break-all">{chain.tokenAddress}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+
+    {/* デスクトップ: テーブル表示 */}
+    <div className="table-wrapper w-full overflow-x-auto hidden md:block">
       <table className="min-w-[600px] w-full border-collapse">
         <thead>
           <tr>
