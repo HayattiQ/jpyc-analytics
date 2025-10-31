@@ -79,6 +79,22 @@
       "tags": ["ウォレット", "ハウツー", "スワップ", "保管"],
       "description": "JPYCの保管・スワップ等の利用導線を解説したユーザー向けハウツーを提示。",
       "url": "https://www.bitget.com/ja/how-to-buy/wallet/jpy-coin-eth"
+    },
+    {
+      "id": "cryptact-pafin",
+      "name": "クリプタクト（pafin）",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["会計", "損益計算", "税務", "申告", "記帳"],
+      "description": "暗号資産の損益計算サービス『クリプタクト』がJPYCの損益計算に対応。履歴集計から申告・記帳まで活用可能。",
+      "url": "https://cryptact.com/"
+    },
+    {
+      "id": "woo-dex",
+      "name": "WOO DEX",
+      "iconUrl": "/jpyc-icon.png",
+      "tags": ["DeFi", "DEX", "スワップ", "取引所"],
+      "description": "日本初の円ステーブルコイン『JPYC』をWOWOO＆WOW Dexに導入決定",
+      "url": "https://dex.woo.org/"
     }
   ]
 }
