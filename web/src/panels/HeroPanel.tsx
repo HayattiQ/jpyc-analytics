@@ -22,14 +22,7 @@ export const HeroPanel = ({ lastUpdated, isLoading }: HeroPanelProps) => {
               ? '読み込み中…'
               : '—'}
         </div>
-        <button
-          type="button"
-          className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold hover:border-[var(--accent)] hover:bg-[rgba(37,99,235,0.08)] disabled:opacity-60"
-          onClick={() => window.location.reload()}
-          disabled={isLoading}
-        >
-          更新
-        </button>
+        {/* 更新ボタンは不要のため削除 */}
       </div>
     </header>
   )

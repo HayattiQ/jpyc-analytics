@@ -14,6 +14,13 @@ export function SimpleTabs() {
   const pathname = usePathname()
   const isAnalytics = pathname === '/' || pathname.startsWith('/analytics')
   const isServices = pathname.startsWith('/services')
+  const goto = (to: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    if (window.location.pathname !== to) {
+      window.history.pushState({}, '', to)
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    }
+  }
   return (
     <nav
       className="top-tabs inline-flex gap-4 justify-center px-5 py-2 mx-auto rounded-full border-2 bg-[var(--surface)] border-[var(--border)] shadow-[0_3px_14px_rgba(15,23,42,0.06)]"
@@ -21,6 +28,7 @@ export function SimpleTabs() {
     >
       <a
         href="/analytics"
+        onClick={goto('/analytics')}
         className={[
           'inline-block font-semibold px-3 py-2 border-b-4 border-transparent hover:opacity-90',
           isAnalytics ? 'text-[color:var(--accent)] border-[var(--accent)]' : ''
@@ -31,6 +39,7 @@ export function SimpleTabs() {
       </a>
       <a
         href="/services"
+        onClick={goto('/services')}
         className={[
           'inline-block font-semibold px-3 py-2 border-b-4 border-transparent hover:opacity-90',
           isServices ? 'text-[color:var(--accent)] border-[var(--accent)]' : ''

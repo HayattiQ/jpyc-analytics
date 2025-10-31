@@ -6,12 +6,9 @@ import { useChainMetrics } from './hooks/useChainMetrics'
 import { useSubgraphDailyStats } from './hooks/useSubgraphDailyStats'
 import { ChainTablePanel } from './panels/ChainTablePanel'
 import { DailySupplyPanel } from './panels/DailySupplyPanel'
-import { Footer } from './panels/Footer'
-import { HeroPanel } from './panels/HeroPanel'
 import { HolderPanel } from './panels/HolderPanel'
 import { SupplyPanel } from './panels/SupplyPanel'
 import { ChainHolderBucketsPanel } from './panels/ChainHolderBucketsPanel'
-import { SimpleTabs } from './components/SimpleTabs'
 
 function App() {
   const {
@@ -20,7 +17,6 @@ function App() {
     totalSupply,
     status,
     errorMessage,
-    lastUpdated,
     reload,
     isInitialLoading
   } = useChainMetrics()
@@ -51,8 +47,6 @@ function App() {
 
   return (
     <div className="app-shell flex flex-col gap-8">
-      <HeroPanel lastUpdated={lastUpdated} isLoading={isInitialLoading} />
-      <SimpleTabs />
       <main className="content flex flex-col gap-6">
         <SupplyPanel
           tokenSymbol={config.token.symbol}
@@ -77,7 +71,6 @@ function App() {
         </div>
         <ChainTablePanel chains={config.chains} />
       </main>
-      <Footer />
     </div>
   )
 }
