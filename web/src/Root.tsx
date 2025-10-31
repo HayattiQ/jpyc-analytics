@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import App from './App'
+import { AnalyticsPage } from './pages/Analytics'
 import { HeroPanel } from './panels/HeroPanel'
 import { SimpleTabs } from './components/SimpleTabs'
 import { Footer } from './panels/Footer'
@@ -19,10 +19,9 @@ export default function Root() {
     <div className="app-shell flex flex-col gap-8">
       <HeroPanel lastUpdated={null} isLoading={false} />
       <SimpleTabs />
-      {!isServices && <App />}
+      {!isServices && <AnalyticsPage />}
       {isServices && <ServicesPage />}
       <Footer />
     </div>
   )
 }
-

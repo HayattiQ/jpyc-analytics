@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { ServiceIcon } from '../components/ServiceIcon'
 
 type ServiceItem = {
   id: string
@@ -19,12 +20,11 @@ type TagMode = 'AND' | 'OR'
 export function ServicesPage() {
   const [data, setData] = useState<ServiceItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [query, setQuery] = useState('')
   const [tagFilter, setTagFilter] = useState<string[]>([])
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
-  const [tagMode, setTagMode] = useState<TagMode>('AND')
+  const tagMode: TagMode = 'AND'
 
   useEffect(() => {
     let mounted = true
@@ -49,27 +49,18 @@ export function ServicesPage() {
   }, [data])
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    const byQuery = (s: ServiceItem) => {
-      if (!q) return true
-      return (
-        s.name.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q) ||
-        s.tags.some((t) => t.toLowerCase().includes(q))
-      )
-    }
     const byTags = (s: ServiceItem) => {
       if (tagFilter.length === 0) return true
       return tagMode === 'AND'
         ? tagFilter.every((t) => s.tags.includes(t))
         : tagFilter.some((t) => s.tags.includes(t))
     }
-    const out = data.filter((s) => byQuery(s) && byTags(s))
+    const out = data.filter((s) => byTags(s))
     out.sort((a, b) =>
       sortDir === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
     )
     return out
-  }, [data, query, tagFilter, tagMode, sortDir])
+  }, [data, tagFilter, tagMode, sortDir])
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const current = Math.min(page, pageCount)
@@ -77,7 +68,7 @@ export function ServicesPage() {
 
   useEffect(() => {
     setPage(1)
-  }, [query, tagFilter, tagMode, pageSize])
+  }, [tagFilter, tagMode, pageSize])
 
   const toggleTag = (t: string) => () => {
     setTagFilter((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]))
@@ -89,43 +80,9 @@ export function ServicesPage() {
 
   return (
     <main className="content flex flex-col gap-4">
+      <section className="panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)] p-4 md:p-5">
       {/* Controls */}
       <section className="services__controls flex flex-col gap-3 my-2">
-        <div className="flex items-center gap-3">
-          <input
-            type="search"
-            placeholder="検索（名前・説明・タグ）"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            aria-label="サービス検索"
-            className="flex-1 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface)]"
-          />
-          <div className="flex items-center gap-2 text-sm">
-            <label className="text-[color:var(--muted)]">タグ条件</label>
-            <div className="inline-flex rounded-full border border-[var(--border)] overflow-hidden">
-              <button
-                className={[
-                  'px-3 py-1',
-                  tagMode === 'AND' ? 'bg-blue-50 font-semibold' : 'bg-transparent'
-                ].join(' ')}
-                onClick={() => setTagMode('AND')}
-                aria-pressed={tagMode === 'AND'}
-              >
-                AND
-              </button>
-              <button
-                className={[
-                  'px-3 py-1',
-                  tagMode === 'OR' ? 'bg-blue-50 font-semibold' : 'bg-transparent'
-                ].join(' ')}
-                onClick={() => setTagMode('OR')}
-                aria-pressed={tagMode === 'OR'}
-              >
-                OR
-              </button>
-            </div>
-          </div>
-        </div>
         <div className="flex flex-wrap gap-2 items-center">
           <div className="services__tags flex flex-wrap gap-2">
             {allTags.map((t) => (
@@ -197,7 +154,7 @@ export function ServicesPage() {
                     className={hasUrl ? '' : 'pointer-events-none opacity-70'}
                     title={hasUrl ? undefined : 'リンクなし'}
                   >
-                    <img src={s.iconUrl} alt={`${s.name} のアイコン`} width={24} height={24} />
+                    <ServiceIcon src={s.iconUrl} />
                   </a>
                   <a
                     href={href}
@@ -284,7 +241,7 @@ export function ServicesPage() {
                         className="inline-flex items-center"
                         title={hasUrl ? undefined : 'リンクなし'}
                       >
-                        <img src={s.iconUrl} alt={`${s.name} のアイコン`} width={24} height={24} />
+                        <ServiceIcon src={s.iconUrl} />
                       </a>
                     </td>
                     <td className="py-2 px-2 border-b border-[var(--border)]">
@@ -336,6 +293,26 @@ export function ServicesPage() {
         >
           次へ
         </button>
+      </section>
+      </section>
+      {/* CTA: 掲載募集パネル */}
+      <section className="panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)] p-5">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <h3 className="m-0 text-xl font-bold">JPYC を利用したサービスの掲載募集</h3>
+            <p className="m-0 mt-1 text-[color:var(--muted)] text-sm">
+              JPYC を採用しているサービスを掲載します。以下のフォームより申請してください。
+            </p>
+          </div>
+          <a
+            href="https://forms.gle/Z4NF4CukPGL4MNP89"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-[var(--border)] bg-blue-600 text-white font-semibold hover:opacity-90"
+          >
+            Google フォームで申請
+          </a>
+        </div>
       </section>
     </main>
   )
