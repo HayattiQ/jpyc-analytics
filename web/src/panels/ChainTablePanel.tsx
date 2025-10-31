@@ -5,21 +5,21 @@ interface ChainTablePanelProps {
 }
 
 export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
-  <section className="panel table-panel">
-    <div className="panel-header">
+  <section className="panel table-panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+    <div className="panel-header flex justify-between gap-4 items-start mb-4">
       <div>
-        <h2>チェーン別 JPYC 情報</h2>
+        <h2 className="font-bold">チェーン別 JPYC 情報</h2>
         <p className="panel-subtitle">コントラクトアドレスや Issuer / Redeem を一覧化</p>
       </div>
     </div>
-    <div className="table-wrapper">
-      <table>
+    <div className="table-wrapper w-full overflow-x-auto">
+      <table className="min-w-[600px] w-full border-collapse">
         <thead>
           <tr>
-            <th>チェーン</th>
-            <th>Issuer</th>
-            <th>Redeem</th>
-            <th>コントラクトアドレス</th>
+            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">チェーン</th>
+            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">Issuer</th>
+            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">Redeem</th>
+            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">コントラクトアドレス</th>
           </tr>
         </thead>
         <tbody>
@@ -39,20 +39,20 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
               : null
             return (
               <tr key={chain.id}>
-                <td>
-                  <div className="chain-cell">
+                <td className="text-left py-3 px-3 border-b border-[var(--border)]">
+                  <div className="chain-cell flex items-center gap-2 font-semibold">
                     <span
-                      className="accent-dot"
+                      className="accent-dot w-[10px] h-[10px] inline-block rounded-full"
                       style={{ backgroundColor: chain.accent }}
                     />
                     {chain.name}
                   </div>
                 </td>
-                <td>
+                <td className="text-left py-3 px-3 border-b border-[var(--border)]">
                   {issuerAddress ? (
                     issuerExplorerHref ? (
                       <a
-                        className="contract-link"
+                        className="contract-link text-[color:var(--accent)] font-semibold inline-flex items-center gap-1 hover:underline"
                         href={issuerExplorerHref}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -60,17 +60,17 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
                         {issuerAddress}
                       </a>
                     ) : (
-                      <span className="contract-address">{issuerAddress}</span>
+                      <span className="contract-address font-mono text-sm break-all">{issuerAddress}</span>
                     )
                   ) : (
                     '—'
                   )}
                 </td>
-                <td>
+                <td className="text-left py-3 px-3 border-b border-[var(--border)]">
                   {redeemAddress ? (
                     redeemExplorerHref ? (
                       <a
-                        className="contract-link"
+                        className="contract-link text-[color:var(--accent)] font-semibold inline-flex items-center gap-1 hover:underline"
                         href={redeemExplorerHref}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -78,16 +78,16 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
                         {redeemAddress}
                       </a>
                     ) : (
-                      <span className="contract-address">{redeemAddress}</span>
+                      <span className="contract-address font-mono text-sm break-all">{redeemAddress}</span>
                     )
                   ) : (
                     '—'
                   )}
                 </td>
-                <td>
+                <td className="text-left py-3 px-3 border-b border-[var(--border)]">
                   {explorerHref ? (
                     <a
-                      className="contract-link"
+                      className="contract-link text-[color:var(--accent)] font-semibold inline-flex items-center gap-1 hover:underline"
                       href={explorerHref}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -95,7 +95,7 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
                       {chain.tokenAddress}
                     </a>
                   ) : (
-                    <span className="contract-address">{chain.tokenAddress}</span>
+                    <span className="contract-address font-mono text-sm break-all">{chain.tokenAddress}</span>
                   )}
                 </td>
               </tr>

@@ -1,11 +1,18 @@
+@import "tailwindcss";
+
 :root {
-  font-family: 'Inter', 'Noto Sans JP', system-ui, -apple-system, BlinkMacSystemFont,
+  /* 日本語の太字レンダリングを優先するため Noto Sans JP を先頭に */
+  font-family: 'Noto Sans JP', 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
     'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color: #0f172a;
   background-color: #eef2ff;
+  /* フォント合成を抑止して重みの見え方を安定化 */
   font-synthesis: none;
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+  font-synthesis-small-caps: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

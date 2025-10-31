@@ -11,6 +11,7 @@ import { HeroPanel } from './panels/HeroPanel'
 import { HolderPanel } from './panels/HolderPanel'
 import { SupplyPanel } from './panels/SupplyPanel'
 import { ChainHolderBucketsPanel } from './panels/ChainHolderBucketsPanel'
+import { SimpleTabs } from './components/SimpleTabs'
 
 function App() {
   const {
@@ -49,9 +50,10 @@ function App() {
   }, [chainDailyStats, daysFromStart])
 
   return (
-    <div className="app-shell">
+    <div className="app-shell flex flex-col gap-8">
       <HeroPanel lastUpdated={lastUpdated} isLoading={isInitialLoading} />
-      <main className="content">
+      <SimpleTabs />
+      <main className="content flex flex-col gap-6">
         <SupplyPanel
           tokenSymbol={config.token.symbol}
           totalSupply={totalSupply}
@@ -61,14 +63,14 @@ function App() {
           onRetry={reload}
           isInitialLoading={isInitialLoading}
         />
-        <div className="panel-grid">
+        <div className="panel-grid grid grid-cols-1 md:grid-cols-2 gap-6">
           <DailySupplyPanel
             data={dailySeries}
             isLoading={dailyStatsLoading && dailySeries.length === 0}
           />
           <HolderPanel data={holderDailySeries} isLoading={dailyStatsLoading} />
         </div>
-        <div className="panel-grid panel-grid--thirds">
+        <div className="panel-grid panel-grid--thirds grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <ChainHolderBucketsPanel chainId="ethereum" />
           <ChainHolderBucketsPanel chainId="polygon" />
           <ChainHolderBucketsPanel chainId="avalanche" />

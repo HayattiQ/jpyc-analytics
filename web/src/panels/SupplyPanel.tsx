@@ -30,30 +30,30 @@ export const SupplyPanel = ({
   onRetry,
   isInitialLoading
 }: SupplyPanelProps) => (
-  <section className="panel">
-    <div className="panel-header">
+  <section className="panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+    <div className="panel-header flex justify-between gap-4 items-start mb-6">
       <div>
-        <h2> リアルタイム チェーン別 発行量</h2>
+        <h2 className="font-bold"> リアルタイム チェーン別 発行量</h2>
       </div>
-      <div className="total">
+      <div className="total text-right text-[var(--muted)]">
         <span>Total</span>
-        <strong>{formatSupplyUnits(totalSupply, tokenSymbol)}</strong>
+        <strong className="block text-[#0f172a] text-2xl mt-1">{formatSupplyUnits(totalSupply, tokenSymbol)}</strong>
       </div>
     </div>
 
     {status === 'error' && (
-      <div className="error-banner">
+      <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">
         <div>
           <strong>データ取得に失敗しました。</strong>
           <span>{errorMessage}</span>
         </div>
-        <button className="ghost-button" onClick={onRetry}>
+        <button className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold" onClick={onRetry}>
           リトライ
         </button>
       </div>
     )}
 
-    <div className="chart-wrapper">
+    <div className="chart-wrapper h-[320px]">
       {isInitialLoading ? (
         <div className="skeleton" aria-hidden />
       ) : (
