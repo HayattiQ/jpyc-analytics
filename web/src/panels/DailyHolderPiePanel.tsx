@@ -11,18 +11,18 @@ export const DailyHolderPiePanel: FC = () => {
   const total = slices.reduce((acc, s) => acc + s.value, 0)
 
   return (
-    <section className="panel panel--compact">
-      <div className="panel-header">
+    <section className="panel panel--compact rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+      <div className="panel-header flex justify-between gap-4 items-start mb-4">
         <div>
-          <h2>日次ホルダー数（円グラフ）</h2>
+          <h2 className="font-bold">日次ホルダー数（円グラフ）</h2>
           <p className="panel-subtitle">エラーのチェーンは除外して表示</p>
         </div>
-        <div className="total">
+        <div className="total text-right text-[var(--muted)]">
           <span>Total</span>
-          <strong>{numberFormatter.format(total)}</strong>
+          <strong className="block text-[#0f172a] text-2xl mt-1">{numberFormatter.format(total)}</strong>
         </div>
       </div>
-      <div className="chart-wrapper">
+      <div className="chart-wrapper h-[320px]">
         {loading ? (
           <div className="skeleton" aria-hidden />
         ) : slices.length === 0 ? (
@@ -60,4 +60,3 @@ export const DailyHolderPiePanel: FC = () => {
     </section>
   )
 }
-

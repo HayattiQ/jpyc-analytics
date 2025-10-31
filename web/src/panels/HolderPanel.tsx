@@ -15,10 +15,10 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
     .map((c) => ({ name: c.name, accent: c.accent }))
 
   return (
-    <section className="panel panel--holder">
-      <div className="panel-header">
+    <section className="panel panel--holder rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+      <div className="panel-header flex justify-between gap-4 items-start mb-6">
         <div>
-          <h2>日次ホルダー数</h2>
+          <h2 className="font-bold">日次ホルダー数</h2>
         </div>
         {(() => {
           const latest = data[data.length - 1]
@@ -26,14 +26,14 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
             ? series.reduce((acc, s) => acc + Number(latest[s.name] ?? 0), 0)
             : 0
           return (
-            <div className="total">
+            <div className="total text-right text-[var(--muted)]">
               <span>Total</span>
-              <strong>{numberFormatter.format(Math.floor(latestTotal))}</strong>
+              <strong className="block text-[#0f172a] text-2xl mt-1">{numberFormatter.format(Math.floor(latestTotal))}</strong>
             </div>
           )
         })()}
       </div>
-      <div className="chart-wrapper">
+      <div className="chart-wrapper h-[320px]">
         {isLoading ? (
           <div className="skeleton" aria-hidden />
         ) : (

@@ -5,17 +5,16 @@ interface HeroPanelProps {
 
 export const HeroPanel = ({ lastUpdated, isLoading }: HeroPanelProps) => {
   return (
-    <header className="hero">
+    <header className="hero flex justify-between gap-8 items-start">
       <div>
-        <h1>JPYC Analytics</h1>
-        <p className="lede">
-          リアルタイムで JPYC のオンチェーン情報を取得し、
-          ひと目で比較できるグラフにまとめました。
-          Powered by <a href="https://x.com/HayattiQ">HayattiQ</a>
+        <h1 className="m-0 text-4xl leading-tight font-bold">JPYC Info</h1>
+        <p className="lede mt-3 text-slate-700 max-w-[720px]">
+          JPYC のオンチェーン情報や、掲載サービスなど、お役立ち情報をまとめました。<br />
+          Powered by <a className="text-[color:var(--accent)] font-semibold" href="https://x.com/HayattiQ">HayattiQ</a>
         </p>
       </div>
-      <div className="hero-meta">
-        <div className="timestamp">
+      <div className="hero-meta flex flex-col items-end gap-3">
+        <div className="timestamp text-sm text-[color:var(--muted)]">
           最終更新:{' '}
           {lastUpdated
             ? lastUpdated.toLocaleString()
@@ -23,14 +22,7 @@ export const HeroPanel = ({ lastUpdated, isLoading }: HeroPanelProps) => {
               ? '読み込み中…'
               : '—'}
         </div>
-        <button
-          type="button"
-          className="ghost-button"
-          onClick={() => window.location.reload()}
-          disabled={isLoading}
-        >
-          更新
-        </button>
+        {/* 更新ボタンは不要のため削除 */}
       </div>
     </header>
   )

@@ -2,24 +2,41 @@
 
 このフォルダは Vite + React のフロントエンドです。
 
+## 技術スタック / 指針
+- フレームワーク: React 19 + Vite 7（TypeScript 5.9, ESM）
+- 型/品質: TypeScript strict、ESLint（typescript-eslint, react-hooks, react-refresh）
+- チャート: Recharts
+- 計測: @vercel/analytics
+- スタイル: 現状はプレーンCSS（`src/App.css`, `src/index.css`）。Tailwind 導入予定（下記）
+- ルーティング: SPA 単一エントリ（Hero直下にタブUI）。将来的に `/services` を導入
+- データ: DB 非採用。`public/data/*.json` を静的配信。
+必要に応じて Headless UI / Radix UI を併用し、アクセシビリティを担保します。
+
+### Services 一覧（計画）
+- ライブラリ: TanStack Table を採用（ヘッドレス）。UIは Tailwind ベースで構築
+- ルート: `/services`（初期リリースは詳細ページなし）
+- データ: `public/data/services.json`（スキーマは `@spec/schemas/services.schema.json`）
+- 機能: 検索、タグANDフィルター、ソート（name）、ページネーション（20/頁）
+- クリック: 名前/アイコンセルで `url` を新規タブ（`rel="noopener noreferrer"`）
+
 ## メタ/OG/Twitter
 - タイトル/説明/OG/Twitter メタは `web/index.html` に定義しています。
 - 既定の OG 画像は `web/public/ogimage2.png`（1200x675, PNG）を参照します。
 
-### 時価総額入りの動的OG画像（SVG）生成
-依存ゼロのスクリプトで SVG を生成できます。価格と供給量から時価総額を描画します。
 
-実行例:
-```
-PRICE=1.02 SUPPLY=100000000 node ../scripts/generate-og.mjs
-# または
-node ../scripts/generate-og.mjs --price 1.02 --supply 100000000
-```
+## セットアップ/開発
+- 依存解決: `bun i`
+- 開発サーバ: `bun run dev`
+- ビルド: `bun run build`
+- Lint/型チェック: `bun run lint && bun run typecheck`
 
-出力: `web/public/og.svg`（既存ファイルを上書き）。本番は静的 `ogimage2.png` を利用中。
+## コーディング規約（抜粋）
+- TypeScript: strict、型エラーゼロを維持
+- import順序: eslint-plugin-import 準拠（現状は typescript-eslint と hooks ルール中心）
+- 秘密情報を埋め込まない（APIキー等は禁止）
 
-メモ:
-- 画像はSNS側で強くキャッシュされることがあります。更新の即時反映が必要な場合はファイル名にバージョンを付与（例: `ogimage2-v2.png`）し、`index.html` の参照先を更新してください。
-
-注記:
-- X(Twitter) など一部プラットフォームは SVG の `og:image` を安定表示しない場合があります。最終的には同デザインの PNG を用意することを推奨します（サーバレス関数やスケジュールジョブで PNG 生成/更新）。
+## ディレクトリ
+- `src/panels/*`: 既存 Analytics の UI パネル
+- `src/components/*`: タブ等の共有UI
+- `public/data/services.json`: Services 一覧のモックデータ
+- `@spec/*`: スキーマ/モック/仕様（同リポジトリ直下）

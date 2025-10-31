@@ -24,13 +24,13 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({ data, isLoading })
     .map((c) => ({ name: c.name, accent: c.accent }))
 
   return (
-    <section className="panel panel--compact">
-      <div className="panel-header">
+    <section className="panel panel--compact rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+      <div className="panel-header flex justify-between gap-4 items-start mb-4">
         <div>
-          <h2>日次供給量</h2>
+          <h2 className="font-bold">日次供給量</h2>
         </div>
       </div>
-      <div className="chart-wrapper">
+      <div className="chart-wrapper h-[320px]">
         {isLoading ? (
           <div className="skeleton" aria-hidden />
         ) : (
