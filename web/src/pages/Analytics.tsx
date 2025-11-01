@@ -20,9 +20,10 @@ export function AnalyticsPage() {
     isInitialLoading
   } = useChainMetrics()
   const ETH_START = Math.floor(Date.parse('2025-10-27T00:00:00Z') / 1000)
+  // 経過日数の算出で除算の優先順位による端数ズレを避ける
   const daysFromStart = Math.max(
     1,
-    Math.floor(Date.now() / 1000 - ETH_START) / 86400 + 1
+    Math.floor((Date.now() / 1000 - ETH_START) / 86400) + 1
   )
   const {
     chainStats: chainDailyStats,

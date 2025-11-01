@@ -37,22 +37,38 @@ const buildFromChainStats = (
 
   if (selected.length === 0) return []
 
-  const chainMaps = chainStats.map((chain) => ({
+  // 前日値でフォワードフィル（当日のエントリが無いチェーンは直近の値を使用）
+  const chainSeries = chainStats.map((chain) => ({
     name: chain.name,
-    data: new Map(
-      chain.stats.map((stat) => [stat.dayStartTimestamp, stat.totalSupply] as const)
-    )
+    entries: chain.stats
+      .map((s) => [s.dayStartTimestamp, s.totalSupply] as const)
+      .sort((a, b) => a[0] - b[0])
   }))
 
-  return selected.map((timestamp) => {
+  // 選択済みタイムスタンプは昇順のはずだが、念のため昇順処理
+  const sortedSelected = [...selected].sort((a, b) => a - b)
+
+  // 各チェーンの現在インデックスと最後の既知値を保持して前方補完
+  const cursors = chainSeries.map(() => ({ idx: 0, last: 0 }))
+
+  return sortedSelected.map((timestamp) => {
     const date = new Date(timestamp * 1000)
     const point: DailySeriesPoint = {
       label: formatLabel(date),
       isoDate: date.toISOString().slice(0, 10)
     }
 
-    chainMaps.forEach((chain) => {
-      const value = chain.data.get(timestamp) ?? 0
+    chainSeries.forEach((chain, i) => {
+      const cursor = cursors[i]
+      // 現在のタイムスタンプまで進める
+      while (
+        cursor.idx < chain.entries.length &&
+        chain.entries[cursor.idx][0] <= timestamp
+      ) {
+        cursor.last = chain.entries[cursor.idx][1]
+        cursor.idx++
+      }
+      const value = cursor.last
       point[chain.name] = Number(value.toFixed(2))
     })
 
@@ -73,22 +89,34 @@ export const buildDailyHolderSeries = (
   const selected = sortedTimestamps.slice(-days)
   if (selected.length === 0) return []
 
-  const chainMaps = chainStats.map((chain) => ({
+  // 前日値でフォワードフィル（当日のエントリが無いチェーンは直近の値を使用）
+  const chainSeries = chainStats.map((chain) => ({
     name: chain.name,
-    data: new Map(
-      chain.stats.map((stat) => [stat.dayStartTimestamp, stat.holderCount ?? 0] as const)
-    )
+    entries: chain.stats
+      .map((s) => [s.dayStartTimestamp, s.holderCount ?? 0] as const)
+      .sort((a, b) => a[0] - b[0])
   }))
 
-  return selected.map((timestamp) => {
+  const sortedSelected = [...selected].sort((a, b) => a - b)
+  const cursors = chainSeries.map(() => ({ idx: 0, last: 0 }))
+
+  return sortedSelected.map((timestamp) => {
     const date = new Date(timestamp * 1000)
     const point: DailySeriesPoint = {
       label: formatLabel(date),
       isoDate: date.toISOString().slice(0, 10)
     }
 
-    chainMaps.forEach((chain) => {
-      const value = chain.data.get(timestamp) ?? 0
+    chainSeries.forEach((chain, i) => {
+      const cursor = cursors[i]
+      while (
+        cursor.idx < chain.entries.length &&
+        chain.entries[cursor.idx][0] <= timestamp
+      ) {
+        cursor.last = chain.entries[cursor.idx][1]
+        cursor.idx++
+      }
+      const value = cursor.last
       point[chain.name] = Math.max(0, Math.floor(Number(value)))
     })
 
