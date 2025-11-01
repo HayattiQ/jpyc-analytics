@@ -102,5 +102,23 @@
       "url": "https://nft-media.net/technology/jpyc-wowoo-wow-dex-introduction/83782/",
       "pressUrl": "https://nft-media.net/technology/jpyc-wowoo-wow-dex-introduction/83782/"
     }
+    ,
+    {
+      "id": "shibaura-seikotsuin-half",
+      "name": "芝浦田町スポーツ整骨院・はり治療院（鍼灸・ほぐし半額）",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=shibaura-seikotsuin.com",
+      "tags": ["実店舗", "ヘルスケア", "決済", "キャンペーン"],
+      "description": "JPYC発行記念。鍼灸・ほぐしの施術料を半額で提供。2025年11月末まで。Web予約時に『JPYC決済』とご記入ください。",
+      "url": "https://shibaura-seikotsuin.com/",
+      "announcementLink": "https://x.com/irifuneshinmori/status/1982662533363421607?s=46"
+    },
+    {
+      "id": "uzuraya-kitakita",
+      "name": "有限会社浜名湖ファーム",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=uzuraya-kitakita.work",
+      "tags": ["食品", "EC", "決済"],
+      "description": "JPYCでウズラの卵の購入に対応。業界内での先駆けとして導入。",
+      "url": "https://uzuraya-kitakita.work"
+    }
   ]
 }

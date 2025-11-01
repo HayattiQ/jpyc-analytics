@@ -35,6 +35,11 @@
           "url": {
             "type": "string",
             "format": "uri"
+          },
+          "announcementLink": {
+            "type": "string",
+            "format": "uri",
+            "description": "プレスリリースではない告知用リンク（X・ブログ等）"
           }
         }
       }
@@ -43,4 +48,3 @@
   "required": ["services"],
   "additionalProperties": false
 }
-
