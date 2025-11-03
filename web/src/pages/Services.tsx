@@ -9,6 +9,7 @@ type ServiceItem = {
   description: string
   url?: string
   pressUrl?: string
+  announcementLink?: string
 }
 
 type ServicesFile = {
@@ -149,6 +150,19 @@ export function ServicesPage() {
                       </a>
                     </>
                   )}
+                  {s.announcementLink && (
+                    <>
+                      {' '}
+                      <a
+                        href={s.announcementLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[color:var(--accent)] hover:underline"
+                      >
+                        （告知リンク）
+                      </a>
+                    </>
+                  )}
                 </p>
               </div>
             )
@@ -247,6 +261,19 @@ export function ServicesPage() {
                             className="text-[color:var(--accent)] hover:underline"
                           >
                             （プレスリリース）
+                          </a>
+                        </>
+                      )}
+                      {s.announcementLink && (
+                        <>
+                          {' '}
+                          <a
+                            href={s.announcementLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[color:var(--accent)] hover:underline"
+                          >
+                            （告知リンク）
                           </a>
                         </>
                       )}

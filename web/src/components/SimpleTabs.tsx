@@ -21,30 +21,45 @@ export function SimpleTabs() {
       window.dispatchEvent(new PopStateEvent('popstate'))
     }
   }
+  const baseClass =
+    'relative inline-flex items-center justify-center font-semibold px-5 py-2 rounded-full border border-transparent text-[color:var(--muted)] transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[color:var(--accent)]'
   return (
     <nav
-      className="top-tabs inline-flex gap-4 justify-center px-5 py-2 mx-auto rounded-full border-2 bg-[var(--surface)] border-[var(--border)] shadow-[0_3px_14px_rgba(15,23,42,0.06)]"
+      className="top-tabs inline-flex items-center gap-2 justify-center px-2 py-1 mx-auto rounded-full border bg-[var(--surface)] border-[var(--border)] shadow-[0_3px_14px_rgba(15,23,42,0.06)]"
       aria-label="ページ切替タブ"
+      role="tablist"
     >
       <a
         href="/analytics"
         onClick={goto('/analytics')}
         className={[
-          'inline-block font-semibold px-3 py-2 border-b-4 border-transparent hover:opacity-90',
-          isAnalytics ? 'text-[color:var(--accent)] border-[var(--accent)]' : ''
+          baseClass,
+          isAnalytics
+            ? 'bg-[color:var(--accent-soft)] text-[color:var(--accent)] border-[var(--accent)]'
+            : 'hover:bg-[color:var(--surface-hover)] hover:text-[color:var(--accent)]'
         ].join(' ')}
         aria-current={isAnalytics ? 'page' : undefined}
+        aria-selected={isAnalytics}
+        role="tab"
       >
         Analytics
       </a>
+      <span
+        aria-hidden="true"
+        className="mx-1 h-6 w-px rounded-full bg-[var(--border)]"
+      />
       <a
         href="/services"
         onClick={goto('/services')}
         className={[
-          'inline-block font-semibold px-3 py-2 border-b-4 border-transparent hover:opacity-90',
-          isServices ? 'text-[color:var(--accent)] border-[var(--accent)]' : ''
+          baseClass,
+          isServices
+            ? 'bg-[color:var(--accent-soft)] text-[color:var(--accent)] border-[var(--accent)]'
+            : 'hover:bg-[color:var(--surface-hover)] hover:text-[color:var(--accent)]'
         ].join(' ')}
         aria-current={isServices ? 'page' : undefined}
+        aria-selected={isServices}
+        role="tab"
       >
         Services
       </a>

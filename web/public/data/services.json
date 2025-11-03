@@ -45,7 +45,7 @@
     {
       "id": "cryptolinc",
       "name": "CryptoLinC（クリプト会計・損益計算）",
-      "iconUrl": "https://cryptolinc.com/favicon.ico",
+      "iconUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAXVBMVEVHcEwANC0AAwMAAQEANywAAAAAAAAAAAAAAAAAAwMAAAAAAAAAAAAAAAAAiXcAiHcARjwAiHcAhnAAhnUAiHcAiHgAiHcAiHcAiHcAgG8AiXgAiHcAAAAAAAAAAADzCouSAAAAH3RSTlMAHV1DC7n/7J0s9uBtzE+LMWUtQK3/tsfkF53x2IRThzYl3QAAAPBJREFUeAF10QeOhSAUQNHHF2kq2LDr/pc5lEfCWG6qOdIhj/wKCh8VJeOCvJIUirmq+smUNAwrb0q1aSu05ke6PrNhtJNDnFXPdjGJV7PYhEL2225ds47oKKIqC+hsygTcEY+aAuDAO9YkbWB/4Aop2s2f6JSYJeFyxyLs2aRT3pAfJ9Ed+Go5zDdkLGzdpfyFbTdkqo7oT4+W0HUiMqZO+YF44zRSr2+Ib+V4NfuWI2fYIcFfzj+UInzwU+rJWsR0FKBXw1hZ9Ga3ERUX2f5o7Y66OIiYUazbLWYohXtxQbuY9S7pHfexh4/6TlPI+gN9pRdpwrgVoQAAAABJRU5ErkJggg==",
       "tags": ["会計", "損益計算", "税務", "申告", "記帳"],
       "description": "JPYC対応を告知。履歴自動集計からP/L計算、申告・記帳までに活用可能。",
       "url": "https://cryptolinc.com/",
@@ -101,6 +101,24 @@
       "description": "日本初の円ステーブルコイン『JPYC』をWOWOO＆WOW Dexに導入決定",
       "url": "https://nft-media.net/technology/jpyc-wowoo-wow-dex-introduction/83782/",
       "pressUrl": "https://nft-media.net/technology/jpyc-wowoo-wow-dex-introduction/83782/"
+    }
+    ,
+    {
+      "id": "shibaura-seikotsuin-half",
+      "name": "芝浦田町スポーツ整骨院・はり治療院（鍼灸・ほぐし半額）",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=shibaura-seikotsuin.com",
+      "tags": ["実店舗", "ヘルスケア", "決済", "キャンペーン"],
+      "description": "JPYC発行記念。鍼灸・ほぐしの施術料を半額で提供。2025年11月末まで。Web予約時に『JPYC決済』とご記入ください。",
+      "url": "https://shibaura-seikotsuin.com/",
+      "announcementLink": "https://x.com/irifuneshinmori/status/1982662533363421607?s=46"
+    },
+    {
+      "id": "uzuraya-kitakita",
+      "name": "有限会社浜名湖ファーム",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=uzuraya-kitakita.work",
+      "tags": ["食品", "EC", "決済"],
+      "description": "JPYCでウズラの卵の購入に対応。業界内での先駆けとして導入。",
+      "url": "https://uzuraya-kitakita.work"
     }
   ]
 }
