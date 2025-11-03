@@ -1,5 +1,5 @@
-import { SUBGRAPH_QUERIES, getSubgraphQuery } from '../src/lib/subgraphQueries.js'
-import type { SubgraphQueryId } from '../src/lib/subgraphQueries.js'
+import { SUBGRAPH_QUERIES, getSubgraphQuery } from './queries'
+import type { SubgraphQueryId } from './queries'
 
 type ChainConfig = {
   id: string

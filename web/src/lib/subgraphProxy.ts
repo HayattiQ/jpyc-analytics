@@ -1,4 +1,10 @@
-import type { SubgraphQueryId } from './subgraphQueries'
+type SubgraphQueryId =
+  | 'GLOBAL_STAT'
+  | 'GLOBAL_BUCKETS'
+  | 'LATEST_DAILY_HOLDER'
+  | 'GLOBAL_STAT_SIMPLE'
+  | 'DAILY_STATS'
+  | 'DAILY_STATS_FROM'
 
 type ChainConfig = {
   id: string
