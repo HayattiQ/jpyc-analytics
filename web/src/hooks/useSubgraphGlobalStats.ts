@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
-import { postSubgraph } from '../lib/subgraphProxy'
+import { fetchSubgraph } from '../lib/subgraphProxy'
 const SUPPORTED_CHAIN_IDS = ['ethereum', 'polygon', 'avalanche'] as const
 
 interface SubgraphGlobalStat {
@@ -55,16 +55,8 @@ export const useSubgraphGlobalStats = () => {
 
       const stats = await Promise.all(
         targetChains.map(async (chain) => {
-          const response = await postSubgraph(chain, {
-            query: `
-              query GlobalStat($id: ID!) {
-                globalStat(id: $id) {
-                  holderCount
-                  totalSupply
-                  updatedAtTimestamp
-                }
-              }
-            `,
+          const response = await fetchSubgraph(chain, {
+            queryId: 'GLOBAL_STAT',
             variables: { id: chain.globalStatId }
           })
 

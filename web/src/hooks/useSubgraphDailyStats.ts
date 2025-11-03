@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
 import type { ChainDailySeries } from '../lib/dailySeries'
-import { postSubgraph } from '../lib/subgraphProxy'
+import { fetchSubgraph } from '../lib/subgraphProxy'
 
 const SUPPORTED_CHAIN_IDS = ['ethereum', 'polygon', 'avalanche'] as const
 
@@ -51,34 +51,13 @@ export const useSubgraphDailyStats = (days = 7, fromTimestamp?: number) => {
       const stats = await Promise.all(
         targetChains.map(async (chain) => {
           const hasFrom = typeof fromTimestamp === 'number' && fromTimestamp > 0
-          const query = hasFrom
-            ? `
-                query DailyStatsFrom($from: BigInt!) {
-                  dailyStats(
-                    first: 1000,
-                    where: { dayStartTimestamp_gte: $from },
-                    orderBy: dayStartTimestamp,
-                    orderDirection: asc
-                  ) {
-                    dayStartTimestamp
-                    totalSupply
-                    holderCount
-                  }
-                }
-              `
-            : `
-                query DailyStats($days: Int!) {
-                  dailyStats(first: $days, orderBy: dayStartTimestamp, orderDirection: desc) {
-                    dayStartTimestamp
-                    totalSupply
-                    holderCount
-                  }
-                }
-              `
-
+          const queryId = hasFrom ? 'DAILY_STATS_FROM' : 'DAILY_STATS'
           const variables = hasFrom ? { from: String(fromTimestamp) } : { days }
 
-          const response = await postSubgraph(chain, { query, variables })
+          const response = await fetchSubgraph(chain, {
+            queryId,
+            variables
+          })
 
           if (!response.ok) {
             throw new Error(`Subgraph error (${chain.name}): ${response.status}`)

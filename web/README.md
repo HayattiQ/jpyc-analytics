@@ -30,11 +30,11 @@
 - ビルド: `bun run build`
 - Lint/型チェック: `bun run lint && bun run typecheck`
 
-### Subgraph キャッシュ
-- Vercel Edge Function (`api/subgraph.ts`) がサブグラフへのリクエストを中継し、デフォルトで 5 分間キャッシュします。
-- Edge Function では `GRAPH_API_BEARER`（Authorization のみ）を参照します。
-- キャッシュ TTL は `SUBGRAPH_CACHE_TTL`（秒）、`SUBGRAPH_CACHE_STALE`（秒）で調整できます。未設定時は `300 / 900`。
-- ローカル開発では `/api/subgraph` が存在しないため、自動的に直接サブグラフへフォールバックします。プロキシを明示的に無効化したい場合は `VITE_SUBGRAPH_PROXY_BASE=direct` を指定してください。
+### Subgraph プロキシ
+- Vercel Edge Function (`api/subgraph.ts`) がサブグラフへの GraphQL リクエストを中継します。
+- Edge Function では `GRAPH_API_BEARER`（Authorization 用）を参照し、クライアントは `/api/subgraph?chain=...&queryId=...` へ `GET` するだけで OK です（必要に応じて `variables` パラメータに JSON 文字列を追加）。クエリ文字列はサーバー側にハードコードされており、`queryId` で切り替えます。
+- 現状はチェーンごとのサブグラフ URL をコードにハードコードしています。追加が必要な場合は `api/subgraph.ts` の `CHAINS` を更新してください。
+- Vercel でのデプロイ時は `vercel.json` にて `bunVersion: "1.x"` を指定しています（Edge Function を Bun Runtime で実行）。
 
 ## コーディング規約（抜粋）
 - TypeScript: strict、型エラーゼロを維持

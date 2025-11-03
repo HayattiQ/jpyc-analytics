@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
 import { formatSupplyUnits, numberFormatter } from '../lib/format'
-import { postSubgraph } from '../lib/subgraphProxy'
+import { fetchSubgraph } from '../lib/subgraphProxy'
 
 export type SupplyStatus = 'idle' | 'loading' | 'success' | 'error'
 
@@ -150,14 +150,8 @@ export const useChainMetrics = () => {
       return null
     }
 
-    const response = await postSubgraph(chain, {
-      query: `
-        query GlobalStat($id: ID!) {
-          globalStat(id: $id) {
-            holderCount
-          }
-        }
-      `,
+    const response = await fetchSubgraph(chain, {
+      queryId: 'GLOBAL_STAT_SIMPLE',
       variables: { id: chain.globalStatId }
     })
 
