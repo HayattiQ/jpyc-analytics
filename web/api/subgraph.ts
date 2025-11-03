@@ -1,4 +1,4 @@
-import appConfig from '../src/config.json'
+import appConfig from '../src/config.json' assert { type: 'json' }
 
 declare const process: {
   env?: Record<string, string | undefined>
