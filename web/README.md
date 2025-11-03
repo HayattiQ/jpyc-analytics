@@ -30,6 +30,12 @@
 - ビルド: `bun run build`
 - Lint/型チェック: `bun run lint && bun run typecheck`
 
+### Subgraph プロキシ
+- Vercel Edge Function (`api/subgraph.ts`) がサブグラフへの GraphQL リクエストを中継します。
+- Edge Function では `GRAPH_API_BEARER`（Authorization 用）を参照し、クライアントは `/api/subgraph?chain=...&queryId=...` へ `GET` するだけで OK です（必要に応じて `variables` パラメータに JSON 文字列を追加）。クエリ文字列はサーバー側にハードコードされており、`queryId` で切り替えます。
+- 現状はチェーンごとのサブグラフ URL をコードにハードコードしています。追加が必要な場合は `api/subgraph.ts` の `CHAINS` を更新してください。
+- Vercel でのデプロイ時は `vercel.json` にて `bunVersion: "1.x"` を指定しています（Edge Function を Bun Runtime で実行）。
+
 ## コーディング規約（抜粋）
 - TypeScript: strict、型エラーゼロを維持
 - import順序: eslint-plugin-import 準拠（現状は typescript-eslint と hooks ルール中心）

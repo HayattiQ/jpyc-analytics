@@ -7,12 +7,19 @@ import { numberFormatter } from '../lib/format'
 interface HolderPanelProps {
   data: DailySeriesPoint[]
   isLoading: boolean
+  errorMessage?: string | null
+  onRetry?: () => void
 }
 
-export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
+export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading, errorMessage, onRetry }) => {
   const series = config.chains
     .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
     .map((c) => ({ name: c.name, accent: c.accent }))
+  const hasError = typeof errorMessage === 'string' && errorMessage.length > 0
+  const hasData = data.length > 0
+  const showSkeleton = isLoading && !hasError
+  const showChart = !showSkeleton && !hasError && hasData
+  const showEmpty = !showSkeleton && !hasError && !hasData
 
   return (
     <section className="panel panel--holder rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
@@ -20,23 +27,44 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
         <div>
           <h2 className="font-bold">日次ホルダー数</h2>
         </div>
-        {(() => {
-          const latest = data[data.length - 1]
-          const latestTotal = latest
-            ? series.reduce((acc, s) => acc + Number(latest[s.name] ?? 0), 0)
-            : 0
-          return (
-            <div className="total text-right text-[var(--muted)]">
-              <span>Total</span>
-              <strong className="block text-[#0f172a] text-2xl mt-1">{numberFormatter.format(Math.floor(latestTotal))}</strong>
-            </div>
-          )
-        })()}
+        {hasData && (
+          (() => {
+            const latest = data[data.length - 1]
+            const latestTotal = latest
+              ? series.reduce((acc, s) => acc + Number(latest[s.name] ?? 0), 0)
+              : 0
+            return (
+              <div className="total text-right text-[var(--muted)]">
+                <span>Total</span>
+                <strong className="block text-[#0f172a] text-2xl mt-1">
+                  {numberFormatter.format(Math.floor(latestTotal))}
+                </strong>
+              </div>
+            )
+          })()
+        )}
       </div>
+      {hasError && (
+        <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">
+          <div>
+            <strong className="block">サブグラフからの取得に失敗しました。</strong>
+            <span>{errorMessage}</span>
+          </div>
+          {typeof onRetry === 'function' && (
+            <button
+              type="button"
+              className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold"
+              onClick={() => onRetry()}
+            >
+              リトライ
+            </button>
+          )}
+        </div>
+      )}
       <div className="chart-wrapper h-[320px]">
-        {isLoading ? (
+        {showSkeleton ? (
           <div className="skeleton" aria-hidden />
-        ) : (
+        ) : showChart ? (
           <ResponsiveContainer width="100%" height={320}>
             {(() => {
               const isMobile = typeof window !== 'undefined' && window.innerWidth <= 480
@@ -87,6 +115,14 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading }) => {
               )
             })()}
           </ResponsiveContainer>
+        ) : showEmpty ? (
+          <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
+            データはまだありません
+          </div>
+        ) : (
+          <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
+            取得をやり直してください
+          </div>
         )}
       </div>
     </section>

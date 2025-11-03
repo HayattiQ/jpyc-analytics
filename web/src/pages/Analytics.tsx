@@ -27,7 +27,9 @@ export function AnalyticsPage() {
   )
   const {
     chainStats: chainDailyStats,
-    loading: dailyStatsLoading
+    loading: dailyStatsLoading,
+    error: dailyStatsError,
+    reload: reloadDailyStats
   } = useSubgraphDailyStats(0, ETH_START)
 
   const dailySeries = useMemo(() => {
@@ -59,8 +61,15 @@ export function AnalyticsPage() {
         <DailySupplyPanel
           data={dailySeries}
           isLoading={dailyStatsLoading && dailySeries.length === 0}
+          errorMessage={dailyStatsError}
+          onRetry={reloadDailyStats}
         />
-        <HolderPanel data={holderDailySeries} isLoading={dailyStatsLoading} />
+        <HolderPanel
+          data={holderDailySeries}
+          isLoading={dailyStatsLoading && holderDailySeries.length === 0}
+          errorMessage={dailyStatsError}
+          onRetry={reloadDailyStats}
+        />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <ChainHolderBucketsPanel chainId="ethereum" />

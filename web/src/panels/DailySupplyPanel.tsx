@@ -15,13 +15,24 @@ import { formatSupplyUnits } from '../lib/format'
 interface DailySupplyPanelProps {
   data: DailySeriesPoint[]
   isLoading: boolean
+  errorMessage?: string | null
+  onRetry?: () => void
 }
 
-export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({ data, isLoading }) => {
+export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
+  data,
+  isLoading,
+  errorMessage,
+  onRetry
+}) => {
   const tokenSymbol = config.token.symbol
   const series = config.chains
     .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
     .map((c) => ({ name: c.name, accent: c.accent }))
+  const hasError = typeof errorMessage === 'string' && errorMessage.length > 0
+  const showSkeleton = isLoading && !hasError
+  const showChart = !showSkeleton && !hasError && data.length > 0
+  const showEmpty = !showSkeleton && !hasError && data.length === 0
 
   return (
     <section className="panel panel--compact rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
@@ -30,10 +41,27 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({ data, isLoading })
           <h2 className="font-bold">日次供給量</h2>
         </div>
       </div>
+      {hasError && (
+        <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">
+          <div>
+            <strong className="block">サブグラフからの取得に失敗しました。</strong>
+            <span>{errorMessage}</span>
+          </div>
+          {typeof onRetry === 'function' && (
+            <button
+              type="button"
+              className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold"
+              onClick={() => onRetry()}
+            >
+              リトライ
+            </button>
+          )}
+        </div>
+      )}
       <div className="chart-wrapper h-[320px]">
-        {isLoading ? (
+        {showSkeleton ? (
           <div className="skeleton" aria-hidden />
-        ) : (
+        ) : showChart ? (
           <ResponsiveContainer width="100%" height={320}>
             {(() => {
               const maxValue = data.reduce((m, p) => {
@@ -83,6 +111,14 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({ data, isLoading })
               )
             })()}
           </ResponsiveContainer>
+        ) : showEmpty ? (
+          <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
+            データはまだありません
+          </div>
+        ) : (
+          <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
+            取得をやり直してください
+          </div>
         )}
       </div>
     </section>
