@@ -32,6 +32,7 @@ const chainsById = new Map<string, ChainConfig>(CHAINS.map((chain) => [chain.id,
 
 const env = (process?.env ?? {}) as EnvRecord
 const bearerToken = env.GRAPH_API_BEARER ?? ''
+const ttlSeconds = Number(env.SUBGRAPH_CACHE_TTL ?? 60)
 
 const SUBGRAPH_QUERIES = {
   GLOBAL_STAT: `
@@ -171,6 +172,11 @@ export default async function handler(request: Request): Promise<Response> {
   const headers = new Headers(upstreamResponse.headers)
   headers.set('Content-Type', 'application/json')
   headers.delete('content-length')
+  const cacheControl = `public, s-maxage=${ttlSeconds}`
+  headers.set('Cache-Control', cacheControl)
+  headers.set('CDN-Cache-Control', cacheControl)
+  headers.set('Vercel-CDN-Cache-Control', cacheControl)
+  headers.set('x-cache-strategy', 'edge-ttl')
 
   return new Response(body, {
     status: upstreamResponse.status,
