@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
 import { formatSupplyUnits, numberFormatter } from '../lib/format'
-import { buildGraphHeaders } from '../lib/graphHeaders'
+import { postSubgraph } from '../lib/subgraphProxy'
 
 export type SupplyStatus = 'idle' | 'loading' | 'success' | 'error'
 
@@ -122,9 +122,9 @@ export const useChainMetrics = () => {
     const redeem = (chain as { redeemAddress?: string }).redeemAddress
     if (redeem) {
       const redeemRes = await fetch(chain.rpcUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(buildBalanceOfPayload(chain, redeem))
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildBalanceOfPayload(chain, redeem))
       })
       if (!redeemRes.ok) {
         throw new Error(`RPC error (balanceOf redeem ${chain.name}): ${redeemRes.status}`)
@@ -150,19 +150,15 @@ export const useChainMetrics = () => {
       return null
     }
 
-    const response = await fetch(chain.subgraphUrl, {
-      method: 'POST',
-      headers: buildGraphHeaders(),
-      body: JSON.stringify({
-        query: `
-          query GlobalStat($id: ID!) {
-            globalStat(id: $id) {
-              holderCount
-            }
+    const response = await postSubgraph(chain, {
+      query: `
+        query GlobalStat($id: ID!) {
+          globalStat(id: $id) {
+            holderCount
           }
-        `,
-        variables: { id: chain.globalStatId }
-      })
+        }
+      `,
+      variables: { id: chain.globalStatId }
     })
 
     if (!response.ok) {

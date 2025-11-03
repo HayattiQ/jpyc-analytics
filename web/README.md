@@ -30,6 +30,12 @@
 - ビルド: `bun run build`
 - Lint/型チェック: `bun run lint && bun run typecheck`
 
+### Subgraph キャッシュ
+- Vercel Edge Function (`api/subgraph.ts`) がサブグラフへのリクエストを中継し、デフォルトで 5 分間キャッシュします。
+- Edge Function では `GRAPH_API_BEARER`（Authorization のみ）を参照します。
+- キャッシュ TTL は `SUBGRAPH_CACHE_TTL`（秒）、`SUBGRAPH_CACHE_STALE`（秒）で調整できます。未設定時は `300 / 900`。
+- ローカル開発では `/api/subgraph` が存在しないため、自動的に直接サブグラフへフォールバックします。プロキシを明示的に無効化したい場合は `VITE_SUBGRAPH_PROXY_BASE=direct` を指定してください。
+
 ## コーディング規約（抜粋）
 - TypeScript: strict、型エラーゼロを維持
 - import順序: eslint-plugin-import 準拠（現状は typescript-eslint と hooks ルール中心）

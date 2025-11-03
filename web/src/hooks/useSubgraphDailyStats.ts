@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
 import type { ChainDailySeries } from '../lib/dailySeries'
-import { buildGraphHeaders } from '../lib/graphHeaders'
+import { postSubgraph } from '../lib/subgraphProxy'
 
 const SUPPORTED_CHAIN_IDS = ['ethereum', 'polygon', 'avalanche'] as const
 
@@ -78,11 +78,7 @@ export const useSubgraphDailyStats = (days = 7, fromTimestamp?: number) => {
 
           const variables = hasFrom ? { from: String(fromTimestamp) } : { days }
 
-          const response = await fetch(chain.subgraphUrl, {
-            method: 'POST',
-            headers: buildGraphHeaders(),
-            body: JSON.stringify({ query, variables })
-          })
+          const response = await postSubgraph(chain, { query, variables })
 
           if (!response.ok) {
             throw new Error(`Subgraph error (${chain.name}): ${response.status}`)

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
-import { buildGraphHeaders } from '../lib/graphHeaders'
+import { postSubgraph } from '../lib/subgraphProxy'
 
 export interface EthHolderBucketsData {
   total: number
@@ -23,24 +23,20 @@ export const useEthHolderBuckets = () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(eth.subgraphUrl, {
-        method: 'POST',
-        headers: buildGraphHeaders(),
-        body: JSON.stringify({
-          query: `
-            query GlobalBuckets($id: ID!) {
-              globalStat(id: $id) {
-                holderCount
-                holdersLe10k
-                holdersLe100k
-                holdersLe1m
-                holdersLe10m
-                holdersGt10m
-              }
+      const res = await postSubgraph(eth, {
+        query: `
+          query GlobalBuckets($id: ID!) {
+            globalStat(id: $id) {
+              holderCount
+              holdersLe10k
+              holdersLe100k
+              holdersLe1m
+              holdersLe10m
+              holdersGt10m
             }
-          `,
-          variables: { id: eth.globalStatId }
-        })
+          }
+        `,
+        variables: { id: eth.globalStatId }
       })
       if (!res.ok) throw new Error(`Subgraph error (Ethereum): ${res.status}`)
       const payload = (await res.json()) as {

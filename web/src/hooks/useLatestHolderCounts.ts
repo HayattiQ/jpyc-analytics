@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import config from '../config.json'
-import { buildGraphHeaders } from '../lib/graphHeaders'
+import { postSubgraph } from '../lib/subgraphProxy'
 
 type ChainConfig = (typeof config.chains)[number]
 
@@ -23,18 +23,14 @@ export const useLatestHolderCounts = () => {
 
   const fetchLatestFor = async (chain: ChainConfig): Promise<LatestHolderCount> => {
     try {
-      const res = await fetch(chain.subgraphUrl, {
-        method: 'POST',
-        headers: buildGraphHeaders(),
-        body: JSON.stringify({
-          query: `
-            query LatestDailyHolder {
-              dailyStats(first: 1, orderBy: dayStartTimestamp, orderDirection: desc) {
-                holderCount
-              }
+      const res = await postSubgraph(chain, {
+        query: `
+          query LatestDailyHolder {
+            dailyStats(first: 1, orderBy: dayStartTimestamp, orderDirection: desc) {
+              holderCount
             }
-          `
-        })
+          }
+        `
       })
 
       if (!res.ok) throw new Error(`Subgraph error (${chain.name}): ${res.status}`)
@@ -74,4 +70,3 @@ export const useLatestHolderCounts = () => {
 
   return { data, loading, error, reload: fetchAll }
 }
-
