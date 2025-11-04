@@ -119,6 +119,15 @@
       "tags": ["食品", "EC", "決済"],
       "description": "JPYCでウズラの卵の購入に対応。業界内での先駆けとして導入。",
       "url": "https://uzuraya-kitakita.work"
+    },
+    {
+      "id": "calenda-salon",
+      "name": "Calenda（美容室）",
+      "iconUrl": "https://photos.app.goo.gl/F3KbPhAn5hgg8djD7",
+      "tags": ["実店舗", "美容"],
+      "description": "JPYC決済の導入を行った美容室。",
+      "url": "https://www.calenda.store/",
+      "announcementLink": "https://x.com/macaroni2010"
     }
   ]
 }
