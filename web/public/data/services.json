@@ -128,6 +128,14 @@
       "description": "JPYC決済の導入を行った美容室。",
       "url": "https://www.calenda.store/",
       "announcementLink": "https://x.com/macaroni2010"
+    },
+    {
+      "id": "jpyc-info-kun",
+      "name": "JPYC情報確認くん",
+      "iconUrl": "https://jpyc.hoku.in/favicon.ico",
+      "tags": ["アナリティクス", "ダッシュボード", "オンチェーン"],
+      "description": "発行量・流通量・ホルダー数など、JPYCに関する各種指標をブラウザ上で横断的に可視化できるコミュニティ製ツール。",
+      "url": "https://jpyc.hoku.in/"
     }
   ]
 }
