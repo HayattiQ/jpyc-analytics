@@ -139,6 +139,15 @@
       "pressUrl": "https://prtimes.jp/main/html/rd/p/000000018.000137837.html"
     },
     {
+      "id": "tria-wallet",
+      "name": "Tria Wallet",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=tria.cards",
+      "tags": ["ウォレット", "決済", "Visa", "プリペイド"],
+      "description": "円建てで購入したJPYCをそのままTriaウォレットへチャージでき、世界中のVisa加盟店で利用できる日常決済を実現。",
+      "url": "https://app.tria.so/?accessCode=GOOIDM3283",
+      "announcementLink": "https://x.com/triajapan/status/1984908344466051472"
+    },
+    {
       "id": "jpyc-info-kun",
       "name": "JPYC情報確認くん",
       "iconUrl": "https://jpyc.hoku.in/favicon.ico",
