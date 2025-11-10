@@ -130,6 +130,15 @@
       "announcementLink": "https://x.com/macaroni2010"
     },
     {
+      "id": "comilio",
+      "name": "comilio（漫画投稿プラットフォーム）",
+      "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=comilio.app",
+      "tags": ["漫画", "投稿プラットフォーム", "決済", "クリエイター支援", "ポイント"],
+      "description": "漫画投稿プラットフォーム「comilio」がJPYCチャージや作品購入、ファンクラブ課金、comilio PAYのエンタメ決済をJPYCのみで完結できるガスレス決済として提供。クリエイター向けのJPYC出金機能にも対応予定。",
+      "url": "https://comilio.app/",
+      "pressUrl": "https://prtimes.jp/main/html/rd/p/000000018.000137837.html"
+    },
+    {
       "id": "jpyc-info-kun",
       "name": "JPYC情報確認くん",
       "iconUrl": "https://jpyc.hoku.in/favicon.ico",
