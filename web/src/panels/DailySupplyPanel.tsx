@@ -50,7 +50,7 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
           <h2 className="font-bold">日次供給量</h2>
         </div>
         {confirmedSummary && (
-          <div className="text-right text-[color:var(--muted)]">
+          <div className="total text-right text-[color:var(--muted)]">
             <span className="text-xs uppercase tracking-wide">
               最新（確定） {confirmedSummary.isoDate}
             </span>

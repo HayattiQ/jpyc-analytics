@@ -51,7 +51,7 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
           </p>
         </div>
         {confirmedSummary && (
-          <div className="text-right text-[color:var(--muted)]">
+          <div className="total text-right text-[color:var(--muted)]">
             <span className="text-xs uppercase tracking-wide">
               最新（確定） {confirmedSummary.isoDate}
             </span>
