@@ -76,6 +76,12 @@ const SUBGRAPH_QUERIES = {
         dayStartTimestamp
         totalSupply
         holderCount
+        transactionVolume
+        inflowVolume
+        outflowVolume
+        netInflow
+        inflowCount
+        outflowCount
       }
     }
   `,
@@ -90,6 +96,12 @@ const SUBGRAPH_QUERIES = {
         dayStartTimestamp
         totalSupply
         holderCount
+        transactionVolume
+        inflowVolume
+        outflowVolume
+        netInflow
+        inflowCount
+        outflowCount
       }
     }
   `

@@ -1,6 +1,11 @@
 import { useMemo } from 'react'
 import config from '../config.json'
-import { buildDailyHolderSeries, buildDailySeries } from '../lib/dailySeries'
+import {
+  buildDailyFlowSeries,
+  buildDailyHolderSeries,
+  buildDailySeries,
+  buildDailyStackedMetricSeries
+} from '../lib/dailySeries'
 import { useChainMetrics } from '../hooks/useChainMetrics'
 import { useSubgraphDailyStats } from '../hooks/useSubgraphDailyStats'
 import { ChainTablePanel } from '../panels/ChainTablePanel'
@@ -8,6 +13,8 @@ import { DailySupplyPanel } from '../panels/DailySupplyPanel'
 import { HolderPanel } from '../panels/HolderPanel'
 import { SupplyPanel } from '../panels/SupplyPanel'
 import { ChainHolderBucketsPanel } from '../panels/ChainHolderBucketsPanel'
+import { TransactionVolumePanel } from '../panels/TransactionVolumePanel'
+import { NetFlowPanel } from '../panels/NetFlowPanel'
 
 export function AnalyticsPage() {
   const {
@@ -32,19 +39,33 @@ export function AnalyticsPage() {
     reload: reloadDailyStats
   } = useSubgraphDailyStats(0, ETH_START)
 
-  const dailySeries = useMemo(() => {
-    const target = chainDailyStats.filter(
-      (cs) => cs.chainId === 'ethereum' || cs.chainId === 'polygon' || cs.chainId === 'avalanche'
-    )
-    return buildDailySeries(supplies, target, Math.floor(daysFromStart))
-  }, [supplies, chainDailyStats, daysFromStart])
+  const trackedChains = useMemo(
+    () =>
+      chainDailyStats.filter(
+        (cs) => cs.chainId === 'ethereum' || cs.chainId === 'polygon' || cs.chainId === 'avalanche'
+      ),
+    [chainDailyStats]
+  )
 
-  const holderDailySeries = useMemo(() => {
-    const target = chainDailyStats.filter(
-      (cs) => cs.chainId === 'ethereum' || cs.chainId === 'polygon' || cs.chainId === 'avalanche'
-    )
-    return buildDailyHolderSeries(target, Math.floor(daysFromStart))
-  }, [chainDailyStats, daysFromStart])
+  const dailySeries = useMemo(
+    () => buildDailySeries(supplies, trackedChains, Math.floor(daysFromStart)),
+    [supplies, trackedChains, daysFromStart]
+  )
+
+  const holderDailySeries = useMemo(
+    () => buildDailyHolderSeries(trackedChains, Math.floor(daysFromStart)),
+    [trackedChains, daysFromStart]
+  )
+
+  const transactionVolumeSeries = useMemo(
+    () => buildDailyStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'transactionVolume'),
+    [trackedChains, daysFromStart]
+  )
+
+  const netFlowSeries = useMemo(
+    () => buildDailyFlowSeries(trackedChains, Math.floor(daysFromStart)),
+    [trackedChains, daysFromStart]
+  )
 
   return (
     <div className="analytics-page flex flex-col gap-6">
@@ -67,6 +88,20 @@ export function AnalyticsPage() {
         <HolderPanel
           data={holderDailySeries}
           isLoading={dailyStatsLoading && holderDailySeries.length === 0}
+          errorMessage={dailyStatsError}
+          onRetry={reloadDailyStats}
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <TransactionVolumePanel
+          data={transactionVolumeSeries}
+          isLoading={dailyStatsLoading && transactionVolumeSeries.length === 0}
+          errorMessage={dailyStatsError}
+          onRetry={reloadDailyStats}
+        />
+        <NetFlowPanel
+          data={netFlowSeries}
+          isLoading={dailyStatsLoading && netFlowSeries.length === 0}
           errorMessage={dailyStatsError}
           onRetry={reloadDailyStats}
         />
