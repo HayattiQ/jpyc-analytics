@@ -9,6 +9,12 @@ interface SubgraphDailyStat {
   dayStartTimestamp: string
   totalSupply: string
   holderCount: string
+  transactionVolume?: string | null
+  inflowVolume?: string | null
+  outflowVolume?: string | null
+  netInflow?: string | null
+  inflowCount?: string | null
+  outflowCount?: string | null
 }
 
 export type ChainDailyStatsResult = ChainDailySeries
@@ -31,12 +37,17 @@ export const useSubgraphDailyStats = (days = 7, fromTimestamp?: number) => {
     []
   )
 
-  const normalizeSupply = (value: string) => {
+  const normalizeTokenAmount = (value?: string | null) => {
+    if (!value) return 0
     const raw = BigInt(value)
     const divisor = 10n ** BigInt(config.token.decimals)
     const integerPart = Number(raw / divisor)
     const fractionPart = Number(raw % divisor) / Number(divisor)
     return integerPart + fractionPart
+  }
+  const normalizeCount = (value?: string | null) => {
+    if (!value) return 0
+    return Number(value)
   }
 
   const fetchDailyStats = useCallback(async () => {
@@ -73,11 +84,26 @@ export const useSubgraphDailyStats = (days = 7, fromTimestamp?: number) => {
           }
 
           const normalizedStats =
-            payload.data?.dailyStats?.map((stat) => ({
-              dayStartTimestamp: Number(stat.dayStartTimestamp),
-              totalSupply: normalizeSupply(stat.totalSupply),
-              holderCount: Number(stat.holderCount)
-            })) ?? []
+            payload.data?.dailyStats?.map((stat) => {
+              const inflowVolume = normalizeTokenAmount(stat.inflowVolume)
+              const outflowVolume = normalizeTokenAmount(stat.outflowVolume)
+              const transactionVolume = normalizeTokenAmount(stat.transactionVolume)
+              const netInflow =
+                typeof stat.netInflow === 'string' && stat.netInflow.length > 0
+                  ? normalizeTokenAmount(stat.netInflow)
+                  : inflowVolume - outflowVolume
+              return {
+                dayStartTimestamp: Number(stat.dayStartTimestamp),
+                totalSupply: normalizeTokenAmount(stat.totalSupply),
+                holderCount: Number(stat.holderCount),
+                transactionVolume,
+                inflowVolume,
+                outflowVolume,
+                netInflow,
+                inflowCount: normalizeCount(stat.inflowCount),
+                outflowCount: normalizeCount(stat.outflowCount)
+              }
+            }) ?? []
 
           return {
             chainId: chain.id,

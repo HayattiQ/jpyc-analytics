@@ -66,6 +66,13 @@ function loadOrCreateGlobalStat(): GlobalStat {
     stat.holderCount = BigInt.zero()
     stat.totalSupply = BigInt.zero()
     stat.circulatingSupply = BigInt.zero()
+    stat.transactionCount = BigInt.zero()
+    stat.transactionVolume = BigInt.zero()
+    stat.inflowVolume = BigInt.zero()
+    stat.outflowVolume = BigInt.zero()
+    stat.netInflow = BigInt.zero()
+    stat.inflowCount = BigInt.zero()
+    stat.outflowCount = BigInt.zero()
     stat.updatedAtBlock = BigInt.zero()
     stat.updatedAtTimestamp = BigInt.zero()
     // initialize new bucket fields
@@ -77,6 +84,13 @@ function loadOrCreateGlobalStat(): GlobalStat {
   } else {
     // Backward compatibility for preexisting entities when schema adds non-null fields
     if (stat.get("circulatingSupply") == null) stat.set("circulatingSupply", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("transactionCount") == null) stat.set("transactionCount", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("transactionVolume") == null) stat.set("transactionVolume", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("inflowVolume") == null) stat.set("inflowVolume", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("outflowVolume") == null) stat.set("outflowVolume", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("netInflow") == null) stat.set("netInflow", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("inflowCount") == null) stat.set("inflowCount", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("outflowCount") == null) stat.set("outflowCount", Value.fromBigInt(BigInt.zero()))
     if (stat.get("holdersLe10k") == null) stat.set("holdersLe10k", Value.fromBigInt(BigInt.zero()))
     if (stat.get("holdersLe100k") == null) stat.set("holdersLe100k", Value.fromBigInt(BigInt.zero()))
     if (stat.get("holdersLe1m") == null) stat.set("holdersLe1m", Value.fromBigInt(BigInt.zero()))
@@ -104,6 +118,13 @@ function loadOrCreateDailyStat(timestamp: BigInt): DailyStat {
     stat.dayStartTimestamp = getDayStartTimestamp(timestamp)
     stat.holderCount = BigInt.zero()
     stat.totalSupply = BigInt.zero()
+    stat.transactionCount = BigInt.zero()
+    stat.transactionVolume = BigInt.zero()
+    stat.inflowVolume = BigInt.zero()
+    stat.outflowVolume = BigInt.zero()
+    stat.netInflow = BigInt.zero()
+    stat.inflowCount = BigInt.zero()
+    stat.outflowCount = BigInt.zero()
     stat.updatedAtBlock = BigInt.zero()
     stat.updatedAtTimestamp = BigInt.zero()
     // initialize new bucket fields
@@ -113,6 +134,13 @@ function loadOrCreateDailyStat(timestamp: BigInt): DailyStat {
     stat.holdersLe10m = BigInt.zero()
     stat.holdersGt10m = BigInt.zero()
   } else {
+    if (stat.get("transactionCount") == null) stat.set("transactionCount", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("transactionVolume") == null) stat.set("transactionVolume", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("inflowVolume") == null) stat.set("inflowVolume", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("outflowVolume") == null) stat.set("outflowVolume", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("netInflow") == null) stat.set("netInflow", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("inflowCount") == null) stat.set("inflowCount", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("outflowCount") == null) stat.set("outflowCount", Value.fromBigInt(BigInt.zero()))
     if (stat.get("holdersLe10k") == null) stat.set("holdersLe10k", Value.fromBigInt(BigInt.zero()))
     if (stat.get("holdersLe100k") == null) stat.set("holdersLe100k", Value.fromBigInt(BigInt.zero()))
     if (stat.get("holdersLe1m") == null) stat.set("holdersLe1m", Value.fromBigInt(BigInt.zero()))
@@ -139,6 +167,8 @@ export function handleTransfer(event: TransferEvent): void {
   let stat = loadOrCreateGlobalStat()
   let minted = event.params.from.equals(ZERO_ADDRESS)
   let burned = event.params.to.equals(ZERO_ADDRESS)
+  let fromIssuer = event.params.from.equals(ISSUER_ADDRESS)
+  let toRedeem = event.params.to.equals(REDEEM_ADDRESS)
 
   if (!minted) {
     let fromAccount = loadOrCreateAccount(event.params.from)
@@ -201,9 +231,31 @@ export function handleTransfer(event: TransferEvent): void {
 
   stat.updatedAtBlock = event.block.number
   stat.updatedAtTimestamp = event.block.timestamp
+  stat.transactionCount = stat.transactionCount.plus(ONE)
+  stat.transactionVolume = stat.transactionVolume.plus(event.params.value)
+  if (fromIssuer) {
+    stat.inflowVolume = stat.inflowVolume.plus(event.params.value)
+    stat.inflowCount = stat.inflowCount.plus(ONE)
+  }
+  if (toRedeem) {
+    stat.outflowVolume = stat.outflowVolume.plus(event.params.value)
+    stat.outflowCount = stat.outflowCount.plus(ONE)
+  }
+  stat.netInflow = stat.inflowVolume.minus(stat.outflowVolume)
   stat.save()
 
   let daily = loadOrCreateDailyStat(event.block.timestamp)
+  daily.transactionCount = daily.transactionCount.plus(ONE)
+  daily.transactionVolume = daily.transactionVolume.plus(event.params.value)
+  if (fromIssuer) {
+    daily.inflowVolume = daily.inflowVolume.plus(event.params.value)
+    daily.inflowCount = daily.inflowCount.plus(ONE)
+  }
+  if (toRedeem) {
+    daily.outflowVolume = daily.outflowVolume.plus(event.params.value)
+    daily.outflowCount = daily.outflowCount.plus(ONE)
+  }
+  daily.netInflow = daily.inflowVolume.minus(daily.outflowVolume)
   daily.holderCount = stat.holderCount
   // 循環供給量（non-issuer 残高の合計）をスナップショット
   daily.totalSupply = stat.circulatingSupply

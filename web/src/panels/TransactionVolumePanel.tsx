@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 import {
-  Bar,
-  BarChart,
+  Area,
+  AreaChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
@@ -12,14 +12,21 @@ import config from '../config.json'
 import type { DailySeriesPoint } from '../lib/dailySeries'
 import { formatSupplyUnits } from '../lib/format'
 
-interface DailySupplyPanelProps {
+interface TransactionVolumePanelProps {
   data: DailySeriesPoint[]
   isLoading: boolean
   errorMessage?: string | null
   onRetry?: () => void
 }
 
-export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
+const UNIT_STEPS = [
+  { value: 1_000_000_000_000, suffix: 'T' },
+  { value: 1_000_000_000, suffix: 'B' },
+  { value: 1_000_000, suffix: 'M' },
+  { value: 1_000, suffix: 'K' }
+] as const
+
+export const TransactionVolumePanel: FC<TransactionVolumePanelProps> = ({
   data,
   isLoading,
   errorMessage,
@@ -30,24 +37,31 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
     .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
     .map((c) => ({ name: c.name, accent: c.accent }))
   const hasError = typeof errorMessage === 'string' && errorMessage.length > 0
+  const hasData = data.length > 0
   const showSkeleton = isLoading && !hasError
-  const showChart = !showSkeleton && !hasError && data.length > 0
-  const showEmpty = !showSkeleton && !hasError && data.length === 0
-  const confirmedSummary =
-    data.length > 0
-      ? (() => {
-          const index = data.length > 1 ? data.length - 2 : data.length - 1
-          const confirmed = data[Math.max(index, 0)]
-          const total = series.reduce((acc, s) => acc + Number(confirmed[s.name] ?? 0), 0)
-          return { isoDate: confirmed.isoDate, total }
-        })()
-      : null
+  const showChart = !showSkeleton && !hasError && hasData
+  const showEmpty = !showSkeleton && !hasError && !hasData
+
+  const confirmedSummary = hasData
+    ? (() => {
+        const index = data.length > 1 ? data.length - 2 : data.length - 1
+        const confirmed = data[Math.max(index, 0)]
+        const confirmedTotal = series.reduce((acc, s) => acc + Number(confirmed[s.name] ?? 0), 0)
+        return {
+          isoDate: confirmed.isoDate,
+          total: confirmedTotal
+        }
+      })()
+    : null
 
   return (
-    <section className="panel panel--compact rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
-      <div className="panel-header flex justify-between gap-4 items-start mb-4">
+    <section className="panel panel--volume rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+      <div className="panel-header flex justify-between gap-4 items-start mb-6">
         <div>
-          <h2 className="font-bold">日次供給量</h2>
+          <h2 className="font-bold">日次TX Volume</h2>
+          <p className="panel-subtitle text-sm text-[color:var(--muted)]">
+            チェーン別の積み上げ推移
+          </p>
         </div>
         {confirmedSummary && (
           <div className="text-right text-[color:var(--muted)]">
@@ -83,17 +97,11 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
         ) : showChart ? (
           <ResponsiveContainer width="100%" height={320}>
             {(() => {
-              const maxValue = data.reduce((m, p) => {
-                const sum = series.reduce((acc, s) => acc + Number(p[s.name] ?? 0), 0)
-                return Math.max(m, sum)
+              const maxValue = data.reduce((max, point) => {
+                const total = series.reduce((sum, s) => sum + Number(point[s.name] ?? 0), 0)
+                return Math.max(max, total)
               }, 0)
-              const units = [
-                { value: 1_000_000_000_000, suffix: 'T' },
-                { value: 1_000_000_000, suffix: 'B' },
-                { value: 1_000_000, suffix: 'M' },
-                { value: 1_000, suffix: 'K' }
-              ] as const
-              const picked = units.find((u) => maxValue >= u.value)
+              const picked = UNIT_STEPS.find((step) => maxValue >= step.value)
               const divisor = picked ? picked.value : 1
               const suffix = picked ? picked.suffix : ''
               const formatTick = (value: number) => `${(value / divisor).toFixed(1)}${suffix}`
@@ -102,31 +110,38 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
               const rightMargin = isMobile ? 8 : 16
 
               return (
-                <BarChart
-                  data={data}
-                  margin={{ top: 8, right: rightMargin, bottom: 8, left: leftMargin }}
-                >
+                <AreaChart data={data} margin={{ top: 8, right: rightMargin, bottom: 8, left: leftMargin }}>
+                  <defs>
+                    {series.map((s) => (
+                      <linearGradient key={s.name} id={`volume-${s.name}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={s.accent} stopOpacity={0.8} />
+                        <stop offset="95%" stopColor={s.accent} stopOpacity={0.1} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <CartesianGrid strokeDasharray="4 4" vertical={false} />
                   <XAxis dataKey="label" stroke="var(--muted)" />
                   <YAxis tickFormatter={formatTick} stroke="var(--muted)" />
                   <Tooltip
                     cursor={{ fill: 'var(--surface-hover)' }}
-                    formatter={(value: number) => formatSupplyUnits(value, tokenSymbol)}
+                    formatter={(value: number) => formatSupplyUnits(Number(value), tokenSymbol)}
                     labelFormatter={(label: string, payload) => {
                       const iso = payload?.[0]?.payload?.isoDate as string | undefined
                       return iso ?? label
                     }}
                   />
-                  {series.map((s, idx) => (
-                    <Bar
+                  {series.map((s) => (
+                    <Area
                       key={s.name}
+                      type="monotone"
                       dataKey={s.name}
-                      stackId="total"
-                      fill={s.accent}
-                      radius={idx === series.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                      stackId="volume"
+                      stroke={s.accent}
+                      fill={`url(#volume-${s.name})`}
+                      fillOpacity={0.7}
                     />
                   ))}
-                </BarChart>
+                </AreaChart>
               )
             })()}
           </ResponsiveContainer>
