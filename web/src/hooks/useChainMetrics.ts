@@ -230,10 +230,6 @@ export const useChainMetrics = () => {
       >
       const failed = results.filter((r) => !r.ok).map((r) => r.name)
 
-      // Summary log
-      console.error(
-        `[useChainMetrics] summary ok=[${ok.map((r) => r.name).join(", ")}] failed=[${failed.join(", ")}]`
-      )
 
       if (ok.length === 0) {
         throw new Error('All chains failed to load')
