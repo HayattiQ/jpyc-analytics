@@ -2,10 +2,7 @@
   "name": "jpyc-analytics-subgraph",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ jpyc-ethereum-analytics",
-    "auth": "graph auth --studio $GRAPH_STUDIO_ACCESS_TOKEN",
+    "auth": "graph auth $GRAPH_ACCESS_TOKEN",
     "codegen:eth": "graph codegen subgraph.yaml",
     "build:eth": "graph build subgraph.yaml",
     "deploy:eth": "graph deploy --node https://api.studio.thegraph.com/deploy/ jpyc-ethereum-analytics subgraph.yaml",
