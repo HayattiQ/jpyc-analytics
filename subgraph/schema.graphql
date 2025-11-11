@@ -20,6 +20,12 @@ type GlobalStat @entity(immutable: false) {
   holderCount: BigInt!
   totalSupply: BigInt!
   circulatingSupply: BigInt!
+  transactionVolume: BigInt!
+  inflowVolume: BigInt!
+  outflowVolume: BigInt!
+  netInflow: BigInt!
+  inflowCount: BigInt!
+  outflowCount: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTimestamp: BigInt!
   # Holder buckets by balance (JPY, token decimals applied)
@@ -37,6 +43,12 @@ type DailyStat @entity(immutable: false) {
   dayStartTimestamp: BigInt!
   holderCount: BigInt!
   totalSupply: BigInt!
+  transactionVolume: BigInt!
+  inflowVolume: BigInt!
+  outflowVolume: BigInt!
+  netInflow: BigInt!
+  inflowCount: BigInt!
+  outflowCount: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTimestamp: BigInt!
   holdersLe10k: BigInt!
