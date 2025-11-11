@@ -66,6 +66,7 @@ function loadOrCreateGlobalStat(): GlobalStat {
     stat.holderCount = BigInt.zero()
     stat.totalSupply = BigInt.zero()
     stat.circulatingSupply = BigInt.zero()
+    stat.transactionCount = BigInt.zero()
     stat.transactionVolume = BigInt.zero()
     stat.inflowVolume = BigInt.zero()
     stat.outflowVolume = BigInt.zero()
@@ -83,6 +84,7 @@ function loadOrCreateGlobalStat(): GlobalStat {
   } else {
     // Backward compatibility for preexisting entities when schema adds non-null fields
     if (stat.get("circulatingSupply") == null) stat.set("circulatingSupply", Value.fromBigInt(BigInt.zero()))
+    if (stat.get("transactionCount") == null) stat.set("transactionCount", Value.fromBigInt(BigInt.zero()))
     if (stat.get("transactionVolume") == null) stat.set("transactionVolume", Value.fromBigInt(BigInt.zero()))
     if (stat.get("inflowVolume") == null) stat.set("inflowVolume", Value.fromBigInt(BigInt.zero()))
     if (stat.get("outflowVolume") == null) stat.set("outflowVolume", Value.fromBigInt(BigInt.zero()))
@@ -116,6 +118,7 @@ function loadOrCreateDailyStat(timestamp: BigInt): DailyStat {
     stat.dayStartTimestamp = getDayStartTimestamp(timestamp)
     stat.holderCount = BigInt.zero()
     stat.totalSupply = BigInt.zero()
+    stat.transactionCount = BigInt.zero()
     stat.transactionVolume = BigInt.zero()
     stat.inflowVolume = BigInt.zero()
     stat.outflowVolume = BigInt.zero()
@@ -131,6 +134,7 @@ function loadOrCreateDailyStat(timestamp: BigInt): DailyStat {
     stat.holdersLe10m = BigInt.zero()
     stat.holdersGt10m = BigInt.zero()
   } else {
+    if (stat.get("transactionCount") == null) stat.set("transactionCount", Value.fromBigInt(BigInt.zero()))
     if (stat.get("transactionVolume") == null) stat.set("transactionVolume", Value.fromBigInt(BigInt.zero()))
     if (stat.get("inflowVolume") == null) stat.set("inflowVolume", Value.fromBigInt(BigInt.zero()))
     if (stat.get("outflowVolume") == null) stat.set("outflowVolume", Value.fromBigInt(BigInt.zero()))
@@ -227,6 +231,7 @@ export function handleTransfer(event: TransferEvent): void {
 
   stat.updatedAtBlock = event.block.number
   stat.updatedAtTimestamp = event.block.timestamp
+  stat.transactionCount = stat.transactionCount.plus(ONE)
   stat.transactionVolume = stat.transactionVolume.plus(event.params.value)
   if (fromIssuer) {
     stat.inflowVolume = stat.inflowVolume.plus(event.params.value)
@@ -240,6 +245,7 @@ export function handleTransfer(event: TransferEvent): void {
   stat.save()
 
   let daily = loadOrCreateDailyStat(event.block.timestamp)
+  daily.transactionCount = daily.transactionCount.plus(ONE)
   daily.transactionVolume = daily.transactionVolume.plus(event.params.value)
   if (fromIssuer) {
     daily.inflowVolume = daily.inflowVolume.plus(event.params.value)

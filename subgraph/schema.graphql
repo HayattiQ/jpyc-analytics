@@ -20,6 +20,7 @@ type GlobalStat @entity(immutable: false) {
   holderCount: BigInt!
   totalSupply: BigInt!
   circulatingSupply: BigInt!
+  transactionCount: BigInt!
   transactionVolume: BigInt!
   inflowVolume: BigInt!
   outflowVolume: BigInt!
@@ -43,6 +44,7 @@ type DailyStat @entity(immutable: false) {
   dayStartTimestamp: BigInt!
   holderCount: BigInt!
   totalSupply: BigInt!
+  transactionCount: BigInt!
   transactionVolume: BigInt!
   inflowVolume: BigInt!
   outflowVolume: BigInt!
