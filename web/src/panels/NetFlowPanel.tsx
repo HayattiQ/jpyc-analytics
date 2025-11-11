@@ -28,9 +28,10 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
   const showChart = !showSkeleton && !hasError && hasData
   const showEmpty = !showSkeleton && !hasError && !hasData
 
-  const latestSummary = hasData
+  const confirmedSummary = hasData
     ? (() => {
-        const latest = data[data.length - 1]
+        const index = data.length > 1 ? data.length - 2 : data.length - 1
+        const latest = data[Math.max(index, 0)]
         return {
           isoDate: latest.isoDate,
           netInflow: latest.netInflow,
@@ -49,19 +50,21 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
             Issuer からの供給と Redeem への回収
           </p>
         </div>
-        {latestSummary && (
+        {confirmedSummary && (
           <div className="text-right text-[color:var(--muted)]">
-            <span className="text-xs uppercase tracking-wide">最新 {latestSummary.isoDate}</span>
+            <span className="text-xs uppercase tracking-wide">
+              最新（確定） {confirmedSummary.isoDate}
+            </span>
             <strong
               className={`block text-2xl ${
-                latestSummary.netInflow >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'
+                confirmedSummary.netInflow >= 0 ? 'text-[#16a34a]' : 'text-[#dc2626]'
               }`}
             >
-              {formatSupplyUnits(latestSummary.netInflow, tokenSymbol)}
+              {formatSupplyUnits(confirmedSummary.netInflow, tokenSymbol)}
             </strong>
             <span className="text-sm block mt-1">
-              {`件数 ${numberFormatter.format(latestSummary.inflowCount)} / ${numberFormatter.format(
-                latestSummary.outflowCount
+              {`件数 ${numberFormatter.format(confirmedSummary.inflowCount)} / ${numberFormatter.format(
+                confirmedSummary.outflowCount
               )}`}
             </span>
           </div>

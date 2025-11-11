@@ -33,6 +33,15 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
   const showSkeleton = isLoading && !hasError
   const showChart = !showSkeleton && !hasError && data.length > 0
   const showEmpty = !showSkeleton && !hasError && data.length === 0
+  const confirmedSummary =
+    data.length > 0
+      ? (() => {
+          const index = data.length > 1 ? data.length - 2 : data.length - 1
+          const confirmed = data[Math.max(index, 0)]
+          const total = series.reduce((acc, s) => acc + Number(confirmed[s.name] ?? 0), 0)
+          return { isoDate: confirmed.isoDate, total }
+        })()
+      : null
 
   return (
     <section className="panel panel--compact rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
@@ -40,6 +49,16 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
         <div>
           <h2 className="font-bold">日次供給量</h2>
         </div>
+        {confirmedSummary && (
+          <div className="text-right text-[color:var(--muted)]">
+            <span className="text-xs uppercase tracking-wide">
+              最新（確定） {confirmedSummary.isoDate}
+            </span>
+            <strong className="block text-2xl text-[#0f172a]">
+              {formatSupplyUnits(confirmedSummary.total, tokenSymbol)}
+            </strong>
+          </div>
+        )}
       </div>
       {hasError && (
         <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">

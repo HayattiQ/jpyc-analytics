@@ -228,9 +228,6 @@ export const useChainMetrics = () => {
           formattedHolderCount: string
         }
       >
-      const failed = results.filter((r) => !r.ok).map((r) => r.name)
-
-
       if (ok.length === 0) {
         throw new Error('All chains failed to load')
       }

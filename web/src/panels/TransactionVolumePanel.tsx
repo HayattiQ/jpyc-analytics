@@ -42,13 +42,14 @@ export const TransactionVolumePanel: FC<TransactionVolumePanelProps> = ({
   const showChart = !showSkeleton && !hasError && hasData
   const showEmpty = !showSkeleton && !hasError && !hasData
 
-  const latestSummary = hasData
+  const confirmedSummary = hasData
     ? (() => {
-        const latest = data[data.length - 1]
-        const latestTotal = series.reduce((acc, s) => acc + Number(latest[s.name] ?? 0), 0)
+        const index = data.length > 1 ? data.length - 2 : data.length - 1
+        const confirmed = data[Math.max(index, 0)]
+        const confirmedTotal = series.reduce((acc, s) => acc + Number(confirmed[s.name] ?? 0), 0)
         return {
-          isoDate: latest.isoDate,
-          total: latestTotal
+          isoDate: confirmed.isoDate,
+          total: confirmedTotal
         }
       })()
     : null
@@ -57,16 +58,18 @@ export const TransactionVolumePanel: FC<TransactionVolumePanelProps> = ({
     <section className="panel panel--volume rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
       <div className="panel-header flex justify-between gap-4 items-start mb-6">
         <div>
-          <h2 className="font-bold">日次トランザクションボリューム</h2>
+          <h2 className="font-bold">日次TX Volume</h2>
           <p className="panel-subtitle text-sm text-[color:var(--muted)]">
             チェーン別の積み上げ推移
           </p>
         </div>
-        {latestSummary && (
+        {confirmedSummary && (
           <div className="text-right text-[color:var(--muted)]">
-            <span className="text-xs uppercase tracking-wide">最新 {latestSummary.isoDate}</span>
+            <span className="text-xs uppercase tracking-wide">
+              最新（確定） {confirmedSummary.isoDate}
+            </span>
             <strong className="block text-2xl text-[#0f172a]">
-              {formatSupplyUnits(latestSummary.total, tokenSymbol)}
+              {formatSupplyUnits(confirmedSummary.total, tokenSymbol)}
             </strong>
           </div>
         )}
