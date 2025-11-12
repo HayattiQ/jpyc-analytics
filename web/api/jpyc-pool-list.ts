@@ -9,7 +9,7 @@ type ChainConfig = {
   name: string
   subgraphId: string
   providerType: string
-  queryType: 'uniswap_v4' | 'uniswap_v3'
+  queryType: 'uniswap_v4' | 'uniswap_v3' | 'messari_pool'
 }
 
 type Token = {
@@ -45,6 +45,7 @@ type PoolsResponse = {
   data?: {
     token0Pools?: PoolEntity[]
     token1Pools?: PoolEntity[]
+    liquidityPools?: MessariLiquidityPool[]
   }
   errors?: { message?: string }[]
 }
@@ -93,18 +94,18 @@ const CHAINS: ChainConfig[] = [
     queryType: 'uniswap_v4'
   },
   {
-    id: 'avalanche-pharaoh',
-    name: 'Pharaoh Exchange (Avalanche)',
-    subgraphId: 'NFHumrUD9wtBRnZnrvkQksZzKpic26uMM5RbZR56Gns',
-    providerType: 'pharaoh',
-    queryType: 'uniswap_v4'
-  },
-  {
     id: 'polygon-univ3',
     name: 'Polygon (Uniswap v3)',
     subgraphId: '3hCPRGf4z88VC5rsBKU5AA9FBBq5nF3jbKJG7VZCbhjm',
     providerType: 'uniswap_v3',
     queryType: 'uniswap_v3'
+  },
+  {
+    id: 'avalanche-lfj',
+    name: 'LFJ (Avalanche)',
+    subgraphId: 'H2VGe2tYavUEosSjomHwxbvCKy3LaNaW8Kjw2KhhHs1K',
+    providerType: 'lfj',
+    queryType: 'messari_pool'
   }
 ]
 
@@ -256,9 +257,93 @@ const UNISWAP_V3_POOLS_QUERY = `
   }
 `
 
-const SUBGRAPH_QUERIES: Record<ChainConfig['queryType'], { query: string; supportsWhereOr: boolean }> = {
-  uniswap_v4: { query: UNISWAP_V4_POOLS_QUERY, supportsWhereOr: true },
-  uniswap_v3: { query: UNISWAP_V3_POOLS_QUERY, supportsWhereOr: false }
+const MESSARI_POOLS_QUERY = `
+  query MessariPools($token: String!, $minUsd: BigDecimal!, $skip: Int!) {
+    liquidityPools(
+      first: 50
+      skip: $skip
+      orderBy: totalValueLockedUSD
+      orderDirection: desc
+      where: { inputTokens_contains: [$token], totalValueLockedUSD_gte: $minUsd }
+    ) {
+      id
+      name
+      inputTokens { id symbol decimals }
+      inputTokenBalances
+      totalValueLockedUSD
+      dailySnapshots(
+        first: 1
+        orderBy: timestamp
+        orderDirection: desc
+      ) {
+        timestamp
+        totalValueLockedUSD
+        dailyVolumeUSD
+        dailySupplySideRevenueUSD
+      }
+    }
+  }
+`
+
+const SUBGRAPH_QUERIES: Record<ChainConfig['queryType'], { query: string }> = {
+  uniswap_v4: { query: UNISWAP_V4_POOLS_QUERY },
+  uniswap_v3: { query: UNISWAP_V3_POOLS_QUERY },
+  messari_pool: { query: MESSARI_POOLS_QUERY }
+}
+
+const convertMessariPool = (pool: MessariLiquidityPool): PoolEntity | null => {
+  if (!Array.isArray(pool.inputTokens) || pool.inputTokens.length < 2) {
+    return null
+  }
+  const balances = pool.inputTokenBalances ?? []
+  if (balances.length < 2) {
+    return null
+  }
+  const jpycIndex = pool.inputTokens.findIndex(
+    (token) => token.id.toLowerCase() === jpycAddress
+  )
+  if (jpycIndex === -1) {
+    return null
+  }
+  const counterIndex = jpycIndex === 0 ? 1 : 0
+  const jpycToken = pool.inputTokens[jpycIndex]
+  const counterToken = pool.inputTokens[counterIndex]
+  const jpycAmount = normalizeMessariBalance(balances[jpycIndex], jpycToken.decimals)
+  const counterAmount = normalizeMessariBalance(balances[counterIndex], counterToken.decimals)
+  const snapshot = pool.dailySnapshots?.[0]
+  const periodStartUnix = snapshot ? Number(snapshot.timestamp) : undefined
+  return {
+    id: pool.id,
+    feeTier: '0',
+    liquidity: '0',
+    token0: jpycToken,
+    token1: counterToken,
+    token0Price: '0',
+    token1Price: '0',
+    totalValueLockedUSD: pool.totalValueLockedUSD,
+    totalValueLockedToken0: jpycAmount.toString(),
+    totalValueLockedToken1: counterAmount.toString(),
+    volumeUSD: '0',
+    feesUSD: '0',
+    poolHourData:
+      typeof periodStartUnix === 'number'
+        ? [
+            {
+              periodStartUnix,
+              tvlUSD: snapshot?.totalValueLockedUSD ?? pool.totalValueLockedUSD,
+              volumeUSD: snapshot?.dailyVolumeUSD ?? '0',
+              feesUSD: snapshot?.dailySupplySideRevenueUSD ?? '0'
+            }
+          ]
+        : []
+  }
+}
+
+const normalizeMessariBalance = (rawBalance: string | undefined, decimalsStr: string): number => {
+  if (!rawBalance) return 0
+  const decimals = Number(decimalsStr ?? '0')
+  const divisor = Math.pow(10, decimals)
+  return Number(rawBalance) / (divisor === 0 ? 1 : divisor)
 }
 
 export const config = { runtime: 'edge' }
@@ -283,21 +368,31 @@ const toNumber = (value: string | undefined) => {
 const fetchPoolsPage = async (chain: ChainConfig, skip: number, from: number, query: string) => {
   const subgraphURL = buildSubgraphUrl(chain.subgraphId)
   console.log(`Fetching JPYC pools from ${subgraphURL} address, ${jpycAddress}`)
-  const variables =
-    chain.queryType === 'uniswap_v3'
-      ? {
+  const variables = (() => {
+    switch (chain.queryType) {
+      case 'uniswap_v3':
+        return {
           first: 50,
           skip,
           from,
           whereToken0: { token0: jpycAddress, totalValueLockedUSD_gte: minTvlUsd.toString() },
           whereToken1: { token1: jpycAddress, totalValueLockedUSD_gte: minTvlUsd.toString() }
         }
-      : {
+      case 'messari_pool':
+        return {
+          token: jpycAddress,
+          minUsd: minTvlUsd.toString(),
+          skip
+        }
+      default:
+        return {
           token: jpycAddress,
           minUsd: minTvlUsd.toString(),
           skip,
           from
         }
+    }
+  })()
   const response = await fetch(subgraphURL, {
     method: 'POST',
     headers: {
@@ -318,6 +413,14 @@ const fetchPoolsPage = async (chain: ChainConfig, skip: number, from: number, qu
   console.log(`[jpyc-pool-list] Raw subgraph response (${chain.id}, skip=${skip}):`, JSON.stringify(payload, null, 2))
   if (payload.errors && payload.errors.length > 0) {
     throw new Error(payload.errors[0].message ?? 'Unknown subgraph error')
+  }
+
+  if (chain.queryType === 'messari_pool') {
+    const pools = (payload.data?.liquidityPools ?? []).map(convertMessariPool).filter((pool): pool is PoolEntity => pool !== null)
+    return {
+      token0Pools: pools,
+      token1Pools: []
+    }
   }
 
   return {
@@ -361,7 +464,8 @@ const collectPoolsForChain = async (chain: ChainConfig): Promise<ApiPool[]> => {
     .map((pool) => {
       const jpycIsToken0 = pool.token0.id.toLowerCase() === jpycAddress
       const counterToken = jpycIsToken0 ? pool.token1 : pool.token0
-      const hourly = pool.poolHourData ?? []
+      const rawHourly = pool.poolHourData ?? []
+      const hourly =  rawHourly
       const volume24h = hourly.reduce((sum, snap) => sum + toNumber(snap.volumeUSD), 0)
       const fees24h = hourly.reduce((sum, snap) => sum + toNumber(snap.feesUSD), 0)
       const latestSnapshot = hourly[0]
@@ -396,7 +500,7 @@ const collectPoolsForChain = async (chain: ChainConfig): Promise<ApiPool[]> => {
         snapshotDate: latestSnapshot ? new Date(latestSnapshot.periodStartUnix * 1000).toISOString() : undefined
       }
 
-      if (chain.queryType === 'uniswap_v3') {
+    if (chain.queryType === 'uniswap_v3') {
         const price = jpycIsToken0 ? toNumber(pool.token1Price) : toNumber(pool.token0Price)
         const jpycUsd = jpycLiquidity * price
         const counterUsd = counterLiquidity
@@ -452,4 +556,19 @@ export default async function handler(request: Request): Promise<Response> {
       error
     }))
   })
+}
+type MessariLiquidityPool = {
+  id: string
+  name: string
+  inputTokens: Token[]
+  inputTokenBalances: string[]
+  totalValueLockedUSD: string
+  dailySnapshots?: MessariPoolSnapshot[]
+}
+
+type MessariPoolSnapshot = {
+  timestamp: string
+  totalValueLockedUSD?: string
+  dailyVolumeUSD?: string
+  dailySupplySideRevenueUSD?: string
 }

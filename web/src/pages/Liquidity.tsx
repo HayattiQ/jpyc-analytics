@@ -30,16 +30,16 @@ const POOL_LINKS: Record<string, string> = {
   ethereum: 'https://www.geckoterminal.com/ja/eth/pools/',
   polygon: 'https://www.geckoterminal.com/ja/polygon_pos/pools/',
   avalanche: 'https://www.geckoterminal.com/ja/avalanche/pools/',
-  'avalanche-pharaoh': 'https://www.geckoterminal.com/ja/avalanche/pools/',
-  'polygon-univ3': 'https://www.geckoterminal.com/ja/polygon_pos/pools/'
+  'polygon-univ3': 'https://www.geckoterminal.com/ja/polygon_pos/pools/',
+  'avalanche-lfj': 'https://www.geckoterminal.com/ja/avalanche/pools/'
 }
 
 const CHAIN_LABELS: Record<string, string> = {
   ethereum: 'Ethereum',
   polygon: 'Polygon',
   avalanche: 'Avalanche',
-  'avalanche-pharaoh': 'Avalanche',
-  'polygon-univ3': 'Polygon'
+  'polygon-univ3': 'Polygon',
+  'avalanche-lfj': 'Avalanche'
 }
 
 const formatUsd = (value: number) => currencyFormatter.format(value)
@@ -51,9 +51,9 @@ const formatDate = (value?: string) =>
 const shorten = (address: string) => `${address.slice(0, 6)}…${address.slice(-4)}`
 
 const providerTypeLabel = (type: string) => {
-  if (type === 'pharaoh') return 'Pharaoh Exchange'
   if (type === 'uniswap_v4') return 'Uniswap v4'
   if (type === 'uniswap_v3') return 'Uniswap v3'
+  if (type === 'lfj') return 'LFJ'
   return type
 }
 
