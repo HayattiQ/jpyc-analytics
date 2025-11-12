@@ -143,8 +143,168 @@
 - 価格ソース失敗: `displayPrice` は Fallback (最後に成功した価格) を使用し、KPI カードに警告アイコン。
 - データ無し: 「未登録の Liquidity Provider です」メッセージと、`config.json` 追記のガイドリンクを docs へ表示。
 
-## 9. 未決・TODO
-1. 各 AMM の Subgraph URL。QuickSwap / Trader Joe / Uniswap V3 以外の優先度調整。
+## 9. Uniswap V4 サブグラフ連携（JPYC）
+### 9.1 目的
+- `external-subgraph/v4-subgraph` に追加した Uniswap v4 サブグラフを活用し、JPYC のマルチチェーン流動性を公式インデックスから直接取得する。
+- Ethereum / Polygon / Avalanche の 3 チェーンについて、JPYC を含む v4 プールを自動検出して流動性・価格・取引量を日次/時間軸で可視化する。
+
+### 9.2 デプロイ & エンドポイント
+| Chain | Graph `network` | PoolManager | Subgraph Name (予定) | Subgraph ID (env key) | Gateway Endpoint 例 |
+|-------|-----------------|-------------|----------------------|-----------------------|---------------------|
+| Ethereum | `mainnet` | `0x000000000004444c5dc75cB358380D2e3dE08A90` | `jpyc-uniswap-v4-ethereum` | `DiYPVdygkfjDWhbxGSqAQxwBKmfKnkWQojqeM2rkLb3G` | `https://gateway.thegraph.com/api/[API_KEY]/subgraphs/id/DiYPVdygkfjDWhbxGSqAQxwBKmfKnkWQojqeM2rkLb3G` |
+| Polygon | `matic` | `0x67366782805870060151383F4BbFF9daB53e5cD6` | `jpyc-uniswap-v4-polygon` | `9yedwRwgQukqbE9KoddUBkLtzNr6tdefQUWT9cDQuKqJ` | `https://gateway.thegraph.com/api/[API_KEY]/subgraphs/id/9yedwRwgQukqbE9KoddUBkLtzNr6tdefQUWT9cDQuKqJ` |
+| Avalanche | `avalanche` | `0x06380C0e0912312B5150364B9DC4542BA0DbBc85` | `jpyc-uniswap-v4-avalanche` | `49JxRo9FGxWpSf5Y5GKQPj5NUpX2HhpoZHpGzNEWQZjq` | `https://gateway.thegraph.com/api/[API_KEY]/subgraphs/id/49JxRo9FGxWpSf5Y5GKQPj5NUpX2HhpoZHpGzNEWQZjq` |
+
+- `graph deploy --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz <Subgraph Name> --version-label liquidity-v4-jpyc` で各チェーンへ公開。デプロイ後に得られる `deploymentId` を上記 env に格納し、`info/web/src/config.json.chains[].liquidity.providers[].subgraph.url` へ反映する。
+- 本番アクセスは Edge Function `/api/subgraph` を経由（`GRAPH_API_BEARER` を Authorization に使用）。TTL は既存設定 (`SUBGRAPH_CACHE_TTL`) を踏襲。
+
+### 9.3 対象エンティティと ID
+- `Token`: JPYC の ID は全チェーン共通で **小文字アドレス** `0xe7c3d8c9a439fede00d2600032d5db0be71c3c29`。`token.decimals`=18。
+- `Pool`: `id` がプールアドレス。JPYC が `token0` or `token1` のものを対象とする。
+- `PoolDayData` / `PoolHourData`: 各プールの日次・時間足スナップショット。履歴チャート／24h 集計に利用。
+- `TokenDayData` / `TokenHourData`: チェーン内の JPYC 全体の流動性・価格・ボリュームを取得。
+
+### 9.4 GraphQL クエリ仕様
+1. **プール一覧（現在値）**
+    ```graphql
+    query JPYCActivePools($token: String!, $minUsd: BigDecimal!, $skip: Int!) {
+      token0Pools: pools(
+        first: 50
+        skip: $skip
+        orderBy: totalValueLockedUSD
+        orderDirection: desc
+        where: { token0: $token, totalValueLockedUSD_gte: $minUsd }
+      ) {
+        id
+        feeTier
+        liquidity
+        token0 { id symbol decimals }
+        token1 { id symbol decimals }
+        token0Price
+        token1Price
+        totalValueLockedUSD
+        totalValueLockedToken0
+        totalValueLockedToken1
+        volumeUSD
+        feesUSD
+        poolDayData(first: 1, orderBy: date, orderDirection: desc) {
+          date
+          tvlUSD
+          volumeUSD
+          feesUSD
+        }
+      }
+      token1Pools: pools(
+        first: 50
+        skip: $skip
+        orderBy: totalValueLockedUSD
+        orderDirection: desc
+        where: { token1: $token, totalValueLockedUSD_gte: $minUsd }
+      ) {
+        id
+        feeTier
+        liquidity
+        token0 { id symbol decimals }
+        token1 { id symbol decimals }
+        token0Price
+        token1Price
+        totalValueLockedUSD
+        totalValueLockedToken0
+        totalValueLockedToken1
+        volumeUSD
+        feesUSD
+        poolDayData(first: 1, orderBy: date, orderDirection: desc) {
+          date
+          tvlUSD
+          volumeUSD
+          feesUSD
+        }
+      }
+    }
+    ```
+    - GraphQL では `OR` 条件が使えないため、`token0`/`token1` で 2 クエリに分けて結果を結合・重複排除する。
+    - `$minUsd` は 1,000 USD などのしきい値でノイズプールを除外。
+
+2. **トークン全体の集計 & 日次ヒストリー**
+    ```graphql
+    query JPYCGlobalHistory($token: String!, $days: Int!) {
+      token(id: $token) {
+        id
+        totalValueLockedUSD
+        volumeUSD
+        feesUSD
+        derivedETH
+      }
+      tokenDayDatas(
+        first: $days
+        orderBy: date
+        orderDirection: desc
+        where: { token: $token }
+      ) {
+        date
+        totalValueLockedUSD
+        volumeUSD
+        priceUSD
+        feesUSD
+      }
+    }
+    ```
+    - `priceUSD` を Liquidity タブの DEX 価格カードに利用。Chainlink が落ちた際のフェイルオーバー経路としても使用。
+    - `$days`=30（KPI）/90（チャート）で切替。
+
+3. **プール別ヒストリカル（チャート / 24h 集計）**
+    ```graphql
+    query PoolHistory($poolId: ID!, $from: Int!) {
+      pool(id: $poolId) {
+        id
+        token0 { id symbol }
+        token1 { id symbol }
+        totalValueLockedUSD
+        poolHourData(
+          first: 168
+          orderBy: periodStartUnix
+          orderDirection: desc
+          where: { periodStartUnix_gte: $from }
+        ) {
+          periodStartUnix
+          tvlUSD
+          volumeUSD
+          feesUSD
+          token0Price
+          token1Price
+        }
+        poolDayData(
+          first: 30
+          orderBy: date
+          orderDirection: desc
+        ) {
+          date
+          tvlUSD
+          volumeUSD
+          feesUSD
+          token0Price
+          token1Price
+        }
+      }
+    }
+    ```
+    - `$from = now - 24h` で直近 24 時間分を取得し、`volumeUSD` の合計で「24h 取引量」を算出。
+    - `poolDayData` は日次チャート／ツールチップに使用。UI 側で `date * 1000` を JS `Date` に変換。
+
+### 9.5 KPI へのマッピング
+- **リアルタイム流動性**: 上記プールクエリの `totalValueLockedUSD` を合計。JPYC 建て表示は `token0/1` のどちらで JPYC が出現したかで `totalValueLockedTokenX` を採用し、18 桁で正規化。
+- **参照価格 (DEX)**: `tokenDayDatas[0].priceUSD` を第 2 優先順位として使用。プール個別では `token0Price` もしくは `1 / token1Price` で JPYC→USD レートを算出（JPYC が token1 の場合は逆数を取る）。
+- **24h 取引量**: `poolHourData` の `volumeUSD` を 24 本分合計。複数プールを合算してチェーン単位 KPI にも利用。
+- **手数料 APR 補完**: `poolHourData.volumeUSD * feeTier / 1e6` を日次手数料に変換し、`tvlUSD` で割って年率換算。
+
+### 9.6 実装ノート
+- `info/web/src/config.json.chains[].liquidity.providers` に `type: "uniswap_v4"` の新規 Provider を 3 チェーン分追加し、`subgraph.fields` へ上記フィールドマッピングを設定する。
+- Edge Function `/api/subgraph` に `queryId: "UNIV4_POOLS" | "UNIV4_TOKEN_HISTORY" | "UNIV4_POOL_HISTORY"` を追加し、`variables` にチェーン ID と `jpycTokenId` を渡す。
+- キャッシュ: プール一覧は 60 秒、ヒストリカルは 10 分キャッシュ。JPYC の新規プールを最大全て拾うため、一括取得→アプリ側でトップ N を選ぶ。
+- エラー処理: `_meta { block { number timestamp } }` を各レスポンスに追加してブロック遅延を UI に表示。5 分以上遅延した場合は Provider 行を `stale` 表示。
+
+## 10. 未決・TODO
+1. QuickSwap / Trader Joe など他 AMM の Subgraph 優先順位と同様の仕様化。
 2. DEX 価格のサンプル取得ロジック（TWAP vs Spot）。
 3. 取引量チャートの履歴保持期間（30 日以上必要か）。
 
