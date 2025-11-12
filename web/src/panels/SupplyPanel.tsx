@@ -33,7 +33,7 @@ export const SupplyPanel = ({
   <section className="panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
     <div className="panel-header flex justify-between gap-4 items-start mb-6">
       <div>
-        <h2 className="font-bold"> リアルタイム チェーン別 発行量</h2>
+        <h2 className="font-bold"> リアルタイム チェーン別 総流通量</h2>
       </div>
       <div className="total text-right text-[var(--muted)]">
         <span>Total</span>
