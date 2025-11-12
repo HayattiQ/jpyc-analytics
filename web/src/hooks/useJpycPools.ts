@@ -3,12 +3,15 @@ import { useCallback, useEffect, useState } from 'react'
 export type LiquidityPool = {
   chainId: string
   chainName: string
+  providerType: string
   poolAddress: string
   pair: string
   feeTier: number
   liquidityUSD: number
   jpycSide: 'token0' | 'token1'
   jpycLiquidity: number
+  counterTokenSymbol: string
+  counterTokenLiquidity: number
   volume24hUSD: number
   fees24hUSD: number
   token0Price: number

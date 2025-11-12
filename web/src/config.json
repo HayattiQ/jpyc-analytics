@@ -68,6 +68,20 @@
       "type": "uniswap_v4",
       "chainId": "avalanche",
       "status": "active"
+    },
+    {
+      "id": "avalanche-pharaoh",
+      "label": "Pharaoh Exchange / Avalanche",
+      "type": "pharaoh",
+      "chainId": "avalanche-pharaoh",
+      "status": "active"
+    },
+    {
+      "id": "polygon-univ3",
+      "label": "Uniswap v3 / Polygon",
+      "type": "uniswap_v3",
+      "chainId": "polygon-univ3",
+      "status": "active"
     }
   ]
 }

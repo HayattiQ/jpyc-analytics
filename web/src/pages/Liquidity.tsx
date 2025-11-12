@@ -18,16 +18,28 @@ const percentFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2
 })
 
-const EXPLORERS: Record<string, string> = {
-  ethereum: 'https://etherscan.io/address/',
-  polygon: 'https://polygonscan.com/address/',
-  avalanche: 'https://snowtrace.io/address/'
+type ProviderConfig = {
+  id: string
+  label: string
+  type: string
+  chainId: string
+  status?: string
+}
+
+const POOL_LINKS: Record<string, string> = {
+  ethereum: 'https://www.geckoterminal.com/ja/eth/pools/',
+  polygon: 'https://www.geckoterminal.com/ja/polygon_pos/pools/',
+  avalanche: 'https://www.geckoterminal.com/ja/avalanche/pools/',
+  'avalanche-pharaoh': 'https://www.geckoterminal.com/ja/avalanche/pools/',
+  'polygon-univ3': 'https://www.geckoterminal.com/ja/polygon_pos/pools/'
 }
 
 const CHAIN_LABELS: Record<string, string> = {
   ethereum: 'Ethereum',
   polygon: 'Polygon',
-  avalanche: 'Avalanche'
+  avalanche: 'Avalanche',
+  'avalanche-pharaoh': 'Avalanche',
+  'polygon-univ3': 'Polygon'
 }
 
 const formatUsd = (value: number) => currencyFormatter.format(value)
@@ -38,18 +50,42 @@ const formatDate = (value?: string) =>
 
 const shorten = (address: string) => `${address.slice(0, 6)}…${address.slice(-4)}`
 
-const PoolRow = ({ pool }: { pool: LiquidityPool }) => {
-  const explorer = EXPLORERS[pool.chainId]
+const providerTypeLabel = (type: string) => {
+  if (type === 'pharaoh') return 'Pharaoh Exchange'
+  if (type === 'uniswap_v4') return 'Uniswap v4'
+  if (type === 'uniswap_v3') return 'Uniswap v3'
+  return type
+}
+
+const buildProviderDisplayName = (provider?: ProviderConfig, pool?: LiquidityPool) => {
+  if (provider) return provider.label
+  if (pool) {
+    const chainLabel = CHAIN_LABELS[pool.chainId] ?? pool.chainName ?? ''
+    return `${providerTypeLabel(pool.providerType)}${chainLabel ? ` / ${chainLabel}` : ''}`
+  }
+  return 'Unknown'
+}
+
+const PoolRow = ({ pool, provider }: { pool: LiquidityPool; provider?: ProviderConfig }) => {
+  const explorer = POOL_LINKS[pool.chainId]
   const link = explorer ? `${explorer}${pool.poolAddress}` : undefined
+  const providerName = buildProviderDisplayName(provider, pool)
+  const chainLabel =
+    (provider && CHAIN_LABELS[provider.chainId]) || CHAIN_LABELS[pool.chainId] || pool.chainName
+  const counterLabel = `${formatAmount(pool.counterTokenLiquidity)} ${pool.counterTokenSymbol}`
   return (
     <tr>
-      <td className="py-2 px-2 border-b border-[var(--border)]">{CHAIN_LABELS[pool.chainId] ?? pool.chainName}</td>
+      <td className="py-2 px-2 border-b border-[var(--border)]">
+        <div className="font-semibold">{providerName}</div>
+        <div className="text-[color:var(--muted)] text-sm">{chainLabel}</div>
+      </td>
       <td className="py-2 px-2 border-b border-[var(--border)]">
         <div className="font-semibold">{pool.pair}</div>
         <div className="text-[color:var(--muted)] text-sm">{formatFee(pool.feeTier)}</div>
       </td>
       <td className="py-2 px-2 border-b border-[var(--border)]">{formatUsd(pool.liquidityUSD)}</td>
       <td className="py-2 px-2 border-b border-[var(--border)]">{formatAmount(pool.jpycLiquidity)} JPYC</td>
+      <td className="py-2 px-2 border-b border-[var(--border)]">{counterLabel}</td>
       <td className="py-2 px-2 border-b border-[var(--border)]">{formatUsd(pool.volume24hUSD)}</td>
       <td className="py-2 px-2 border-b border-[var(--border)]">{formatUsd(pool.fees24hUSD)}</td>
       <td className="py-2 px-2 border-b border-[var(--border)]">
@@ -110,7 +146,14 @@ type SortKey = 'tvl' | 'volume' | 'fees' | 'jpyc' | 'feeTier'
 
 export function LiquidityPage() {
   const { pools, failedChains, updatedAt, loading, error } = useJpycPools()
-  const providers = useMemo(() => config.liquidityProviders ?? [], [])
+  const providers = useMemo<ProviderConfig[]>(() => (config.liquidityProviders ?? []) as ProviderConfig[], [])
+  const providerIndex = useMemo(() => {
+    const map = new Map<string, ProviderConfig>()
+    providers.forEach((provider) => {
+      map.set(`${provider.chainId}:${provider.type}`, provider)
+    })
+    return map
+  }, [providers])
   const [chainFilter, setChainFilter] = useState<string>('all')
   const [sortKey, setSortKey] = useState<SortKey>('tvl')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
@@ -174,17 +217,30 @@ export function LiquidityPage() {
         failing?: boolean
       }
     >()
+    providers.forEach((provider) => {
+      stats.set(provider.id, {
+        providerId: provider.id,
+        label: provider.label,
+        type: provider.type,
+        chainName: CHAIN_LABELS[provider.chainId] ?? provider.chainId,
+        poolCount: 0,
+        tvl: 0,
+        jpyc: 0,
+        volume: 0,
+        fees: 0,
+        failing: provider.status === 'inactive' ? true : undefined
+      })
+    })
+
     pools.forEach((pool) => {
-      const provider = providers.find(
-        (entry) => entry.chainId === pool.chainId && entry.type === 'uniswap_v4'
-      )
-      if (!provider) return
+      const provider = providerIndex.get(`${pool.chainId}:${pool.providerType}`)
+      const key = provider?.id ?? `${pool.chainId}:${pool.providerType}`
       const entry =
-        stats.get(provider.id) ??
+        stats.get(key) ??
         {
-          providerId: provider.id,
-          label: provider.label,
-          type: provider.type,
+          providerId: key,
+          label: buildProviderDisplayName(provider, pool),
+          type: pool.providerType,
           chainName: CHAIN_LABELS[pool.chainId] ?? pool.chainName,
           poolCount: 0,
           tvl: 0,
@@ -197,40 +253,42 @@ export function LiquidityPage() {
       entry.jpyc += pool.jpycLiquidity
       entry.volume += pool.volume24hUSD
       entry.fees += pool.fees24hUSD
-      stats.set(provider.id, entry)
+      stats.set(key, entry)
     })
+
     failedChains.forEach((failed) => {
-      const provider = providers.find(
-        (entry) => entry.chainId === failed.chainId && entry.type === 'uniswap_v4'
-      )
-      if (!provider) return
-      const entry =
-        stats.get(provider.id) ??
-        {
-          providerId: provider.id,
-          label: provider.label,
-          type: provider.type,
-          chainName: CHAIN_LABELS[failed.chainId] ?? failed.chainId,
-          poolCount: 0,
-          tvl: 0,
-          jpyc: 0,
-          volume: 0,
-          fees: 0
-        }
-      entry.failing = true
-      stats.set(provider.id, entry)
+      providers
+        .filter((provider) => provider.chainId === failed.chainId)
+        .forEach((provider) => {
+          const entry =
+            stats.get(provider.id) ??
+            {
+              providerId: provider.id,
+              label: provider.label,
+              type: provider.type,
+              chainName: CHAIN_LABELS[provider.chainId] ?? provider.chainId,
+              poolCount: 0,
+              tvl: 0,
+              jpyc: 0,
+              volume: 0,
+              fees: 0
+            }
+          entry.failing = true
+          stats.set(provider.id, entry)
+        })
     })
+
     return Array.from(stats.values()).sort((a, b) => b.tvl - a.tvl)
-  }, [pools, failedChains, providers])
+  }, [pools, failedChains, providers, providerIndex])
 
   return (
     <div className="liquidity-page flex flex-col gap-6">
       <section className="panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)] p-5">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-xl font-semibold mb-1">Uniswap v4 流動性監視</h2>
+            <h2 className="text-xl font-semibold mb-1">JPYC 流動性監視</h2>
             <p className="text-sm text-[color:var(--muted)]">
-              JPYC を含むプールをチェーン横断で取得し、TVL・24h ボリューム・手数料を一覧表示します。
+              Uniswap v4 / Pharaoh Exchange など主要 DEX の JPYC プールを横断的にモニタリングします。
             </p>
             <dl className="flex flex-wrap gap-4 text-sm mt-2">
               <div>
@@ -285,7 +343,7 @@ export function LiquidityPage() {
             <table className="w-full min-w-[720px] border-collapse text-sm">
               <thead>
                 <tr className="bg-[var(--surface-hover)] text-[color:var(--muted)]">
-                  <th className="text-left py-2 px-2">チェーン</th>
+                  <th className="text-left py-2 px-2">Provider / チェーン</th>
                   <th className="text-left py-2 px-2">
                     <SortHeader
                       label="ペア / Fee"
@@ -310,6 +368,7 @@ export function LiquidityPage() {
                       onClick={() => toggleSort('jpyc')}
                     />
                   </th>
+                  <th className="text-left py-2 px-2">対向トークン残高</th>
                   <th className="text-left py-2 px-2">
                     <SortHeader
                       label="24h Volume"
@@ -330,9 +389,16 @@ export function LiquidityPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredPools.map((pool) => (
-                  <PoolRow key={pool.poolAddress} pool={pool} />
-                ))}
+                {filteredPools.map((pool) => {
+                  const provider = providerIndex.get(`${pool.chainId}:${pool.providerType}`)
+                  return (
+                    <PoolRow
+                      key={`${pool.providerType}-${pool.poolAddress}`}
+                      pool={pool}
+                      provider={provider}
+                    />
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -344,7 +410,7 @@ export function LiquidityPage() {
           <div>
             <h3 className="text-lg font-semibold">Provider Summary</h3>
             <p className="text-sm text-[color:var(--muted)]">
-              Uniswap v4 をチェーンごとに集計し、プール数・TVL・24h 指標を確認できます。
+              Uniswap v4 / Pharaoh Exchange など登録済みプロバイダ単位で TVL と 24h 指標を集計しています。
             </p>
           </div>
           <div className="text-sm text-[color:var(--muted)]">
