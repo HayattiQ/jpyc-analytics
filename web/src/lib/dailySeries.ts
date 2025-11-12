@@ -14,6 +14,12 @@ export interface NormalizedDailyStat {
   dayStartTimestamp: number
   totalSupply: number
   holderCount?: number
+  transactionVolume?: number
+  inflowVolume?: number
+  outflowVolume?: number
+  netInflow?: number
+  inflowCount?: number
+  outflowCount?: number
 }
 
 export interface ChainDailySeries {
@@ -23,17 +29,28 @@ export interface ChainDailySeries {
   stats: NormalizedDailyStat[]
 }
 
-const buildFromChainStats = (
-  chainStats: ChainDailySeries[],
-  days: number
-): DailySeriesPoint[] => {
+const formatPoint = (timestamp: number): { label: string; isoDate: string } => {
+  const date = new Date(timestamp * 1000)
+  return {
+    label: formatLabel(date),
+    isoDate: date.toISOString().slice(0, 10)
+  }
+}
+
+const buildTimestampUniverse = (chainStats: ChainDailySeries[]): number[] => {
   const timestampSet = new Set<number>()
   chainStats.forEach((chain) => {
     chain.stats.forEach((stat) => timestampSet.add(stat.dayStartTimestamp))
   })
+  return Array.from(timestampSet).sort((a, b) => a - b)
+}
 
-  const sortedTimestamps = Array.from(timestampSet).sort((a, b) => a - b)
-  const selected = sortedTimestamps.slice(-days)
+const buildFromChainStats = (
+  chainStats: ChainDailySeries[],
+  days: number
+): DailySeriesPoint[] => {
+  const timestampUniverse = buildTimestampUniverse(chainStats)
+  const selected = timestampUniverse.slice(-days)
 
   if (selected.length === 0) return []
 
@@ -52,11 +69,7 @@ const buildFromChainStats = (
   const cursors = chainSeries.map(() => ({ idx: 0, last: 0 }))
 
   return sortedSelected.map((timestamp) => {
-    const date = new Date(timestamp * 1000)
-    const point: DailySeriesPoint = {
-      label: formatLabel(date),
-      isoDate: date.toISOString().slice(0, 10)
-    }
+    const point: DailySeriesPoint = formatPoint(timestamp)
 
     chainSeries.forEach((chain, i) => {
       const cursor = cursors[i]
@@ -80,13 +93,8 @@ export const buildDailyHolderSeries = (
   chainStats: ChainDailySeries[],
   days: number
 ): DailySeriesPoint[] => {
-  const timestampSet = new Set<number>()
-  chainStats.forEach((chain) => {
-    chain.stats.forEach((stat) => timestampSet.add(stat.dayStartTimestamp))
-  })
-
-  const sortedTimestamps = Array.from(timestampSet).sort((a, b) => a - b)
-  const selected = sortedTimestamps.slice(-days)
+  const timestampUniverse = buildTimestampUniverse(chainStats)
+  const selected = timestampUniverse.slice(-days)
   if (selected.length === 0) return []
 
   // 前日値でフォワードフィル（当日のエントリが無いチェーンは直近の値を使用）
@@ -101,11 +109,7 @@ export const buildDailyHolderSeries = (
   const cursors = chainSeries.map(() => ({ idx: 0, last: 0 }))
 
   return sortedSelected.map((timestamp) => {
-    const date = new Date(timestamp * 1000)
-    const point: DailySeriesPoint = {
-      label: formatLabel(date),
-      isoDate: date.toISOString().slice(0, 10)
-    }
+    const point: DailySeriesPoint = formatPoint(timestamp)
 
     chainSeries.forEach((chain, i) => {
       const cursor = cursors[i]
@@ -173,4 +177,101 @@ export const buildDailySeries = (
   }
 
   return buildSyntheticSeries(supplies, days)
+}
+
+type MetricKey = 'transactionVolume' | 'inflowVolume' | 'outflowVolume' | 'netInflow'
+
+const getStatMetric = (stat: NormalizedDailyStat, metric: MetricKey): number => {
+  const value = stat[metric]
+  if (typeof value !== 'number' || Number.isNaN(value)) return 0
+  return value
+}
+
+const roundValue = (value: number) => Number(value.toFixed(2))
+
+export const buildDailyStackedMetricSeries = (
+  chainStats: ChainDailySeries[],
+  days: number,
+  metric: MetricKey
+): DailySeriesPoint[] => {
+  if (chainStats.length === 0 || days <= 0) return []
+  const timestampUniverse = buildTimestampUniverse(chainStats)
+  const selected = timestampUniverse.slice(-days)
+  if (selected.length === 0) return []
+
+  const metricMaps = chainStats.map((chain) => {
+    const map = new Map<number, number>()
+    chain.stats.forEach((stat) => {
+      map.set(stat.dayStartTimestamp, getStatMetric(stat, metric))
+    })
+    return { name: chain.name, map }
+  })
+
+  const sortedSelected = [...selected].sort((a, b) => a - b)
+  return sortedSelected.map((timestamp) => {
+    const point: DailySeriesPoint = formatPoint(timestamp)
+    metricMaps.forEach(({ name, map }) => {
+      point[name] = roundValue(map.get(timestamp) ?? 0)
+    })
+    return point
+  })
+}
+
+export interface FlowSeriesPoint {
+  label: string
+  isoDate: string
+  inflow: number
+  outflow: number
+  inflowAbs: number
+  outflowAbs: number
+  netInflow: number
+  inflowCount: number
+  outflowCount: number
+}
+
+const createFlowBucket = () => ({
+  inflow: 0,
+  outflow: 0,
+  inflowCount: 0,
+  outflowCount: 0
+})
+
+export const buildDailyFlowSeries = (
+  chainStats: ChainDailySeries[],
+  days: number
+): FlowSeriesPoint[] => {
+  if (chainStats.length === 0 || days <= 0) return []
+  const aggregate = new Map<number, ReturnType<typeof createFlowBucket>>()
+
+  chainStats.forEach((chain) => {
+    chain.stats.forEach((stat) => {
+      const bucket = aggregate.get(stat.dayStartTimestamp) ?? createFlowBucket()
+      bucket.inflow += stat.inflowVolume ?? 0
+      bucket.outflow += stat.outflowVolume ?? 0
+      bucket.inflowCount += stat.inflowCount ?? 0
+      bucket.outflowCount += stat.outflowCount ?? 0
+      aggregate.set(stat.dayStartTimestamp, bucket)
+    })
+  })
+
+  const timestamps = Array.from(aggregate.keys()).sort((a, b) => a - b)
+  const selected = timestamps.slice(-days)
+  if (selected.length === 0) return []
+
+  return selected.map((timestamp) => {
+    const bucket = aggregate.get(timestamp) ?? createFlowBucket()
+    const inflow = roundValue(bucket.inflow)
+    const outflow = roundValue(bucket.outflow)
+    const net = roundValue(bucket.inflow - bucket.outflow)
+    return {
+      ...formatPoint(timestamp),
+      inflow,
+      outflow: -outflow,
+      inflowAbs: inflow,
+      outflowAbs: outflow,
+      netInflow: net,
+      inflowCount: bucket.inflowCount,
+      outflowCount: bucket.outflowCount
+    }
+  })
 }

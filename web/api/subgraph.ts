@@ -76,6 +76,12 @@ const SUBGRAPH_QUERIES = {
         dayStartTimestamp
         totalSupply
         holderCount
+        transactionVolume
+        inflowVolume
+        outflowVolume
+        netInflow
+        inflowCount
+        outflowCount
       }
     }
   `,
@@ -90,6 +96,12 @@ const SUBGRAPH_QUERIES = {
         dayStartTimestamp
         totalSupply
         holderCount
+        transactionVolume
+        inflowVolume
+        outflowVolume
+        netInflow
+        inflowCount
+        outflowCount
       }
     }
   `
@@ -135,6 +147,7 @@ const isValidQueryId = (value: string): value is SubgraphQueryId =>
   Object.prototype.hasOwnProperty.call(SUBGRAPH_QUERIES, value)
 
 export default async function handler(request: Request): Promise<Response> {
+  console.log("Received request:", request.url);
   if (request.method !== 'GET') {
     return new Response('Method Not Allowed', {
       status: 405,
@@ -178,6 +191,7 @@ export default async function handler(request: Request): Promise<Response> {
   headers.set('Vercel-CDN-Cache-Control', cacheControl)
   headers.set('x-cache-strategy', 'edge-ttl')
 
+  console.log("response body:", body);
   return new Response(body, {
     status: upstreamResponse.status,
     statusText: upstreamResponse.statusText,
