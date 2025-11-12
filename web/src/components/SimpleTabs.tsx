@@ -14,6 +14,7 @@ export function SimpleTabs() {
   const pathname = usePathname()
   const isAnalytics = pathname === '/' || pathname.startsWith('/analytics')
   const isServices = pathname.startsWith('/services')
+  const isLiquidity = pathname.startsWith('/liquidity')
   const goto = (to: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     if (window.location.pathname !== to) {
@@ -62,6 +63,25 @@ export function SimpleTabs() {
         role="tab"
       >
         Services
+      </a>
+      <span
+        aria-hidden="true"
+        className="mx-1 h-6 w-px rounded-full bg-[var(--border)]"
+      />
+      <a
+        href="/liquidity"
+        onClick={goto('/liquidity')}
+        className={[
+          baseClass,
+          isLiquidity
+            ? 'bg-[color:var(--accent-soft)] text-[color:var(--accent)] border-[var(--accent)]'
+            : 'hover:bg-[color:var(--surface-hover)] hover:text-[color:var(--accent)]'
+        ].join(' ')}
+        aria-current={isLiquidity ? 'page' : undefined}
+        aria-selected={isLiquidity}
+        role="tab"
+      >
+        Liquidity
       </a>
     </nav>
   )

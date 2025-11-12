@@ -74,7 +74,7 @@ const CHAINS: ChainConfig[] = [
   {
     id: 'polygon',
     name: 'Polygon',
-    subgraphId: '9yedwRwgQukqbE9KoddUBkLtzNr6tdefQUWT9cDQuKqJ'
+    subgraphId: 'CwpebM66AH5uqS5sreKij8yEkkPcHvmyEs7EwFtdM5ND'
   },
   {
     id: 'avalanche',

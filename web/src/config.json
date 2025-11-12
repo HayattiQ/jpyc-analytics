@@ -46,5 +46,28 @@
       "startBlock": "70965440",
       "accent": "#e84142"
     }
+  ],
+  "liquidityProviders": [
+    {
+      "id": "ethereum-univ4",
+      "label": "Uniswap v4 / Ethereum",
+      "type": "uniswap_v4",
+      "chainId": "ethereum",
+      "status": "active"
+    },
+    {
+      "id": "polygon-univ4",
+      "label": "Uniswap v4 / Polygon",
+      "type": "uniswap_v4",
+      "chainId": "polygon",
+      "status": "active"
+    },
+    {
+      "id": "avalanche-univ4",
+      "label": "Uniswap v4 / Avalanche",
+      "type": "uniswap_v4",
+      "chainId": "avalanche",
+      "status": "active"
+    }
   ]
 }
