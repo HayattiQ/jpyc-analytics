@@ -191,7 +191,6 @@ export default async function handler(request: Request): Promise<Response> {
   headers.set('Vercel-CDN-Cache-Control', cacheControl)
   headers.set('x-cache-strategy', 'edge-ttl')
 
-  console.log("response body:", body);
   return new Response(body, {
     status: upstreamResponse.status,
     statusText: upstreamResponse.statusText,

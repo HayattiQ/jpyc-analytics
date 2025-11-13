@@ -15,6 +15,8 @@ import { SupplyPanel } from '../panels/SupplyPanel'
 import { ChainHolderBucketsPanel } from '../panels/ChainHolderBucketsPanel'
 import { TransactionVolumePanel } from '../panels/TransactionVolumePanel'
 import { NetFlowPanel } from '../panels/NetFlowPanel'
+import { DailyIssuancePanel } from '../panels/DailyIssuancePanel'
+import { DailyRedemptionPanel } from '../panels/DailyRedemptionPanel'
 
 export function AnalyticsPage() {
   const {
@@ -62,6 +64,16 @@ export function AnalyticsPage() {
     [trackedChains, daysFromStart]
   )
 
+  const issuanceStackedSeries = useMemo(
+    () => buildDailyStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'inflowVolume'),
+    [trackedChains, daysFromStart]
+  )
+
+  const redemptionStackedSeries = useMemo(
+    () => buildDailyStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'outflowVolume'),
+    [trackedChains, daysFromStart]
+  )
+
   const netFlowSeries = useMemo(
     () => buildDailyFlowSeries(trackedChains, Math.floor(daysFromStart)),
     [trackedChains, daysFromStart]
@@ -102,6 +114,20 @@ export function AnalyticsPage() {
         <NetFlowPanel
           data={netFlowSeries}
           isLoading={dailyStatsLoading && netFlowSeries.length === 0}
+          errorMessage={dailyStatsError}
+          onRetry={reloadDailyStats}
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <DailyIssuancePanel
+          data={issuanceStackedSeries}
+          isLoading={dailyStatsLoading && issuanceStackedSeries.length === 0}
+          errorMessage={dailyStatsError}
+          onRetry={reloadDailyStats}
+        />
+        <DailyRedemptionPanel
+          data={redemptionStackedSeries}
+          isLoading={dailyStatsLoading && redemptionStackedSeries.length === 0}
           errorMessage={dailyStatsError}
           onRetry={reloadDailyStats}
         />
