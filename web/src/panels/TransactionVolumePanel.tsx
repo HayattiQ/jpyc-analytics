@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import config from '../config.json'
 import type { DailySeriesPoint } from '../lib/dailySeries'
 import { StackedMetricPanel } from './StackedMetricPanel'
@@ -16,6 +17,7 @@ export const TransactionVolumePanel: FC<TransactionVolumePanelProps> = ({
   errorMessage,
   onRetry
 }) => {
+  const { t } = useTranslation()
   const tokenSymbol = config.token.symbol
   const series = config.chains
     .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
@@ -23,8 +25,8 @@ export const TransactionVolumePanel: FC<TransactionVolumePanelProps> = ({
 
   return (
     <StackedMetricPanel
-      title="日次TX Volume"
-      subtitle="チェーン別の積み上げ推移"
+      title={t('panels.transactionVolume.title')}
+      subtitle={t('panels.transactionVolume.subtitle')}
       data={data}
       series={series}
       tokenSymbol={tokenSymbol}

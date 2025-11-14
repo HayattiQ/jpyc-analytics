@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import config from '../config.json'
 import type { DailySeriesPoint } from '../lib/dailySeries'
@@ -12,6 +13,7 @@ interface HolderPanelProps {
 }
 
 export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading, errorMessage, onRetry }) => {
+  const { t } = useTranslation()
   const series = config.chains
     .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
     .map((c) => ({ name: c.name, accent: c.accent }))
@@ -25,7 +27,7 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading, errorMessag
     <section className="panel panel--holder rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
       <div className="panel-header flex justify-between gap-4 items-start mb-6">
         <div>
-          <h2 className="font-bold">日次ホルダー数</h2>
+          <h2 className="font-bold">{t('panels.holder.title')}</h2>
         </div>
         {hasData && (
           (() => {
@@ -35,7 +37,7 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading, errorMessag
               : 0
             return (
               <div className="total text-right text-[var(--muted)]">
-                <span>Total</span>
+                <span>{t('messages.total')}</span>
                 <strong className="block text-[#0f172a] text-2xl mt-1">
                   {numberFormatter.format(Math.floor(latestTotal))}
                 </strong>
@@ -47,7 +49,7 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading, errorMessag
       {hasError && (
         <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">
           <div>
-            <strong className="block">サブグラフからの取得に失敗しました。</strong>
+            <strong className="block">{t('messages.subgraphError')}</strong>
             <span>{errorMessage}</span>
           </div>
           {typeof onRetry === 'function' && (
@@ -56,7 +58,7 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading, errorMessag
               className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold"
               onClick={() => onRetry()}
             >
-              リトライ
+              {t('messages.retry')}
             </button>
           )}
         </div>
@@ -117,11 +119,11 @@ export const HolderPanel: FC<HolderPanelProps> = ({ data, isLoading, errorMessag
           </ResponsiveContainer>
         ) : showEmpty ? (
           <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
-            データはまだありません
+            {t('messages.noData')}
           </div>
         ) : (
           <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
-            取得をやり直してください
+            {t('messages.refetch')}
           </div>
         )}
       </div>

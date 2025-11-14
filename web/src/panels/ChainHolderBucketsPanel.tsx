@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { useChainHolderBuckets } from '../hooks/useChainHolderBuckets'
 import { numberFormatter } from '../lib/format'
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export const ChainHolderBucketsPanel: FC<Props> = ({ chainId }) => {
+  const { t } = useTranslation()
   const { data, loading, error, reload, chain } = useChainHolderBuckets(chainId)
   const slices = data
     ? [
@@ -46,21 +48,23 @@ export const ChainHolderBucketsPanel: FC<Props> = ({ chainId }) => {
     <section className="panel panel--bucket rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
       <div className="panel-header flex justify-between gap-4 items-start mb-4">
         <div>
-          <h2 className="font-bold">ホルダー数 保有額別割合（{chain?.name ?? chainId}）</h2>
+          <h2 className="font-bold">
+            {t('panels.chainHolderBuckets.title', { chain: chain?.name ?? chainId })}
+          </h2>
         </div>
         <div className="total text-right text-[var(--muted)]">
-          <span>Total</span>
+          <span>{t('messages.total')}</span>
           <strong className="block text-[#0f172a] text-2xl mt-1">{numberFormatter.format(total)}</strong>
         </div>
       </div>
       {error && (
         <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">
           <div>
-            <strong>データ取得に失敗しました。</strong>
+            <strong>{t('messages.genericError')}</strong>
             <span>{error}</span>
           </div>
           <button className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold" onClick={reload}>
-            リトライ
+            {t('messages.retry')}
           </button>
         </div>
       )}
@@ -69,7 +73,7 @@ export const ChainHolderBucketsPanel: FC<Props> = ({ chainId }) => {
           <div className="skeleton" aria-hidden />
         ) : slices.length === 0 ? (
           <div className="coming-soon-placeholder" aria-hidden>
-            No data
+            {t('messages.noData')}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={typeof window !== 'undefined' && window.innerWidth <= 480 ? 200 : 260}>
