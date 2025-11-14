@@ -1,0 +1,37 @@
+name: Japanese Text Guard
+
+on:
+  push:
+    paths:
+      - 'web/**'
+      - 'scripts/check-japanese-text.mjs'
+      - '.github/workflows/japanese-text-guard.yml'
+  pull_request:
+    paths:
+      - 'web/**'
+      - 'scripts/check-japanese-text.mjs'
+      - '.github/workflows/japanese-text-guard.yml'
+
+jobs:
+  japanese-text-scan:
+    name: Detect Japanese Strings Outside i18n
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Japanese text scanner
+        run: node scripts/check-japanese-text.mjs
+        env:
+          I18N_GUARD_HEAD_SHA: ${{ github.sha }}
+          I18N_GUARD_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          I18N_GUARD_BASE_REF: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
+          I18N_GUARD_INCLUDE_DIRS: web/src
+          I18N_GUARD_DEFAULT_BASE: ${{ github.event.repository.default_branch }}
