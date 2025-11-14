@@ -1,17 +1,20 @@
+import { useTranslation } from 'react-i18next'
 import type { ChainConfig } from '../hooks/useChainMetrics'
 
 interface ChainTablePanelProps {
   chains: ChainConfig[]
 }
 
-export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
-  <section className="panel table-panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
-    <div className="panel-header flex justify-between gap-4 items-start mb-4">
-      <div>
-        <h2 className="font-bold">チェーン別 JPYC 情報</h2>
-        <p className="panel-subtitle">コントラクトアドレスや Issuer / Redeem を一覧化</p>
+export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => {
+  const { t } = useTranslation()
+  return (
+    <section className="panel table-panel rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+      <div className="panel-header flex justify-between gap-4 items-start mb-4">
+        <div>
+          <h2 className="font-bold">{t('panels.chainTable.title')}</h2>
+          <p className="panel-subtitle">{t('panels.chainTable.subtitle')}</p>
+        </div>
       </div>
-    </div>
 
     {/* モバイル: カード型 */}
     <div className="md:hidden space-y-3">
@@ -38,7 +41,9 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
             </div>
             <div className="text-sm grid grid-cols-1 gap-1">
               <div>
-                <span className="text-[color:var(--muted)] mr-2">Issuer:</span>
+                <span className="text-[color:var(--muted)] mr-2">
+                  {t('panels.chainTable.labels.issuer')}
+                </span>
                 {issuerAddress ? (
                   issuerExplorerHref ? (
                     <a className="text-[color:var(--accent)] font-semibold break-all" href={issuerExplorerHref} target="_blank" rel="noopener noreferrer">
@@ -52,7 +57,9 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
                 )}
               </div>
               <div>
-                <span className="text-[color:var(--muted)] mr-2">Redeem:</span>
+                <span className="text-[color:var(--muted)] mr-2">
+                  {t('panels.chainTable.labels.redeem')}
+                </span>
                 {redeemAddress ? (
                   redeemExplorerHref ? (
                     <a className="text-[color:var(--accent)] font-semibold break-all" href={redeemExplorerHref} target="_blank" rel="noopener noreferrer">
@@ -66,7 +73,9 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
                 )}
               </div>
               <div>
-                <span className="text-[color:var(--muted)] mr-2">Contract:</span>
+                <span className="text-[color:var(--muted)] mr-2">
+                  {t('panels.chainTable.labels.contract')}
+                </span>
                 {explorerHref ? (
                   <a className="text-[color:var(--accent)] font-semibold break-all" href={explorerHref} target="_blank" rel="noopener noreferrer">
                     {chain.tokenAddress}
@@ -86,10 +95,18 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
       <table className="min-w-[600px] w-full border-collapse">
         <thead>
           <tr>
-            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">チェーン</th>
-            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">Issuer</th>
-            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">Redeem</th>
-            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">コントラクトアドレス</th>
+            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">
+              {t('panels.chainTable.columns.chain')}
+            </th>
+            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">
+              {t('panels.chainTable.columns.issuer')}
+            </th>
+            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">
+              {t('panels.chainTable.columns.redeem')}
+            </th>
+            <th className="text-left py-3 px-3 bg-[var(--surface-hover)] text-[color:var(--muted)] font-semibold border-b border-[var(--border)]">
+              {t('panels.chainTable.columns.contract')}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -175,4 +192,5 @@ export const ChainTablePanel = ({ chains }: ChainTablePanelProps) => (
       </table>
     </div>
   </section>
-)
+  )
+}

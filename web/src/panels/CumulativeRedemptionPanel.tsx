@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import config from '../config.json'
 import type { DailySeriesPoint } from '../lib/dailySeries'
 import { StackedMetricPanel } from './StackedMetricPanel'
@@ -16,6 +17,7 @@ export const CumulativeRedemptionPanel: FC<CumulativeRedemptionPanelProps> = ({
   errorMessage,
   onRetry
 }) => {
+  const { t } = useTranslation()
   const tokenSymbol = config.token.symbol
   const series = config.chains
     .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
@@ -23,8 +25,8 @@ export const CumulativeRedemptionPanel: FC<CumulativeRedemptionPanelProps> = ({
 
   return (
     <StackedMetricPanel
-      title="総償還額（累積）"
-      subtitle="償還額チェーン別積み上げ / 累積値"
+      title={t('panels.cumulativeRedemption.title')}
+      subtitle={t('panels.cumulativeRedemption.subtitle')}
       data={data}
       series={series}
       tokenSymbol={tokenSymbol}

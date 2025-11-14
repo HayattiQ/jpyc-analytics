@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import config from '../config.json'
 import type { DailySeriesPoint } from '../lib/dailySeries'
 import { StackedMetricPanel } from './StackedMetricPanel'
@@ -16,6 +17,7 @@ export const DailyRedemptionPanel: FC<DailyRedemptionPanelProps> = ({
   errorMessage,
   onRetry
 }) => {
+  const { t } = useTranslation()
   const tokenSymbol = config.token.symbol
   const series = config.chains
     .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
@@ -23,8 +25,8 @@ export const DailyRedemptionPanel: FC<DailyRedemptionPanelProps> = ({
 
   return (
     <StackedMetricPanel
-      title="運営への日次償還額"
-      subtitle="償還額 チェーン別積み上げ"
+      title={t('panels.dailyRedemption.title')}
+      subtitle={t('panels.dailyRedemption.subtitle')}
       data={data}
       series={series}
       tokenSymbol={tokenSymbol}

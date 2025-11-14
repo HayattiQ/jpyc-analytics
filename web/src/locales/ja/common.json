@@ -1,0 +1,93 @@
+{
+  "hero": {
+    "title": "JPYC Info",
+    "description": "JPYC のオンチェーン情報や、掲載サービスなど、お役立ち情報をまとめました。",
+    "poweredBy": "Powered by <brand>HayattiQ</brand>",
+    "lastUpdated": "最終更新",
+    "loading": "読み込み中…",
+    "notAvailable": "—"
+  },
+  "tabs": {
+    "navLabel": "ページ切替タブ",
+    "analytics": "Analytics",
+    "services": "Services"
+  },
+  "footer": {
+    "poweredBy": "Powered by <brand>HayattiQ</brand>",
+    "github": "GitHub"
+  },
+  "messages": {
+    "latestConfirmed": "最新（確定） {{date}}",
+    "subgraphError": "サブグラフからの取得に失敗しました。",
+    "genericError": "データ取得に失敗しました。",
+    "retry": "リトライ",
+    "noData": "データはまだありません",
+    "refetch": "取得をやり直してください",
+    "total": "合計"
+  },
+  "panels": {
+    "supply": {
+      "title": "リアルタイム チェーン別 総流通量"
+    },
+    "dailySupply": {
+      "title": "日次供給量"
+    },
+    "holder": {
+      "title": "日次ホルダー数"
+    },
+    "transactionVolume": {
+      "title": "日次TX Volume",
+      "subtitle": "チェーン別の積み上げ推移"
+    },
+    "netFlow": {
+      "title": "日次 Inflow / Outflow",
+      "subtitle": "Issuer からの供給と Redeem への回収",
+      "countsLabel": "件数 {{inflow}} / {{outflow}}",
+      "tooltip": {
+        "inflow": "インフロー",
+        "outflow": "アウトフロー"
+      }
+    },
+    "dailyIssuance": {
+      "title": "運営からの日次発行額",
+      "subtitle": "発行額 チェーン別積み上げ"
+    },
+    "dailyRedemption": {
+      "title": "運営への日次償還額",
+      "subtitle": "償還額 チェーン別積み上げ"
+    },
+    "cumulativeIssuance": {
+      "title": "総発行額（累積）",
+      "subtitle": "発行額チェーン別積み上げ / 累積値"
+    },
+    "cumulativeRedemption": {
+      "title": "総償還額（累積）",
+      "subtitle": "償還額チェーン別積み上げ / 累積値"
+    },
+    "dailyHolderPie": {
+      "title": "日次ホルダー数（円グラフ）",
+      "subtitle": "エラーのチェーンは除外して表示"
+    },
+    "chainHolderBuckets": {
+      "title": "ホルダー数 保有額別割合（{{chain}}）"
+    },
+    "chainTable": {
+      "title": "チェーン別 JPYC 情報",
+      "subtitle": "コントラクトアドレスや Issuer / Redeem を一覧化",
+      "columns": {
+        "chain": "チェーン",
+        "issuer": "Issuer",
+        "redeem": "Redeem",
+        "contract": "コントラクトアドレス"
+      },
+      "labels": {
+        "issuer": "Issuer:",
+        "redeem": "Redeem:",
+        "contract": "Contract:"
+      }
+    },
+    "ethHolderBuckets": {
+      "title": "Ethereum 保有額別 割合"
+    }
+  }
+}

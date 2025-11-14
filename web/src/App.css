@@ -49,6 +49,36 @@
   gap: 0.75rem;
 }
 
+.language-toggle {
+  display: inline-flex;
+  gap: 0.35rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 0.2rem 0.4rem;
+}
+
+.language-toggle__btn {
+  font-size: 0.85rem;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.2rem 0.8rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.language-toggle__btn:hover {
+  background-color: var(--surface-hover);
+}
+
+.language-toggle__btn--active {
+  background-color: color-mix(in srgb, var(--accent) 15%, white);
+  color: var(--accent);
+}
+
 /* Simple top tabs under hero */
 .top-tabs {
   display: inline-flex;

@@ -1,9 +1,11 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { useEthHolderBuckets } from '../hooks/useEthHolderBuckets'
 import { numberFormatter } from '../lib/format'
 
 export const EthHolderBucketsPanel: FC = () => {
+  const { t } = useTranslation()
   const { data, loading, error, reload } = useEthHolderBuckets()
   const slices = data
     ? [
@@ -42,21 +44,21 @@ export const EthHolderBucketsPanel: FC = () => {
     <section className="panel panel--bucket">
       <div className="panel-header">
         <div>
-          <h2>Ethereum 保有額別 割合</h2>
+          <h2>{t('panels.ethHolderBuckets.title')}</h2>
         </div>
         <div className="total">
-          <span>Total</span>
+          <span>{t('messages.total')}</span>
           <strong>{numberFormatter.format(total)}</strong>
         </div>
       </div>
       {error && (
         <div className="error-banner">
           <div>
-            <strong>データ取得に失敗しました。</strong>
+            <strong>{t('messages.genericError')}</strong>
             <span>{error}</span>
           </div>
           <button className="ghost-button" onClick={reload}>
-            リトライ
+            {t('messages.retry')}
           </button>
         </div>
       )}
@@ -65,7 +67,7 @@ export const EthHolderBucketsPanel: FC = () => {
           <div className="skeleton" aria-hidden />
         ) : slices.length === 0 ? (
           <div className="coming-soon-placeholder" aria-hidden>
-            No data
+            {t('messages.noData')}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={typeof window !== 'undefined' && window.innerWidth <= 480 ? 200 : 260}>
