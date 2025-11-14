@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Area,
   AreaChart,
@@ -44,6 +45,7 @@ export const StackedMetricPanel: FC<StackedMetricPanelProps> = ({
   errorMessage,
   onRetry
 }) => {
+  const { t } = useTranslation()
   const chartHeight = 260
   const hasError = typeof errorMessage === 'string' && errorMessage.length > 0
   const hasData = data.length > 0
@@ -75,7 +77,7 @@ export const StackedMetricPanel: FC<StackedMetricPanelProps> = ({
         {confirmedSummary && (
           <div className="total text-right text-[color:var(--muted)] text-xs">
             <span className="uppercase tracking-wide">
-              最新（確定） {confirmedSummary.isoDate}
+              {t('messages.latestConfirmed', { date: confirmedSummary.isoDate })}
             </span>
             <strong className="block text-xl text-[#0f172a]">
               {formatSupplyUnits(confirmedSummary.total, tokenSymbol)}
@@ -86,7 +88,7 @@ export const StackedMetricPanel: FC<StackedMetricPanelProps> = ({
       {hasError && (
         <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">
           <div>
-            <strong className="block">サブグラフからの取得に失敗しました。</strong>
+            <strong className="block">{t('messages.subgraphError')}</strong>
             <span>{errorMessage}</span>
           </div>
           {typeof onRetry === 'function' && (
@@ -95,7 +97,7 @@ export const StackedMetricPanel: FC<StackedMetricPanelProps> = ({
               className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold"
               onClick={() => onRetry()}
             >
-              リトライ
+              {t('messages.retry')}
             </button>
           )}
         </div>
@@ -156,11 +158,11 @@ export const StackedMetricPanel: FC<StackedMetricPanelProps> = ({
           </ResponsiveContainer>
         ) : showEmpty ? (
           <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
-            データはまだありません
+            {t('messages.noData')}
           </div>
         ) : (
           <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
-            取得をやり直してください
+            {t('messages.refetch')}
           </div>
         )}
       </div>

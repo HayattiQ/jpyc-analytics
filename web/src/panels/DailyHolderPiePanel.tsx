@@ -1,9 +1,11 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { useLatestHolderCounts } from '../hooks/useLatestHolderCounts'
 import { numberFormatter } from '../lib/format'
 
 export const DailyHolderPiePanel: FC = () => {
+  const { t } = useTranslation()
   const { data, loading } = useLatestHolderCounts()
   const slices = data
     .filter((d) => d.holderCount !== null)
@@ -14,11 +16,11 @@ export const DailyHolderPiePanel: FC = () => {
     <section className="panel panel--compact rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
       <div className="panel-header flex justify-between gap-4 items-start mb-4">
         <div>
-          <h2 className="font-bold">日次ホルダー数（円グラフ）</h2>
-          <p className="panel-subtitle">エラーのチェーンは除外して表示</p>
+          <h2 className="font-bold">{t('panels.dailyHolderPie.title')}</h2>
+          <p className="panel-subtitle">{t('panels.dailyHolderPie.subtitle')}</p>
         </div>
         <div className="total text-right text-[var(--muted)]">
-          <span>Total</span>
+          <span>{t('messages.total')}</span>
           <strong className="block text-[#0f172a] text-2xl mt-1">{numberFormatter.format(total)}</strong>
         </div>
       </div>
@@ -27,7 +29,7 @@ export const DailyHolderPiePanel: FC = () => {
           <div className="skeleton" aria-hidden />
         ) : slices.length === 0 ? (
           <div className="coming-soon-placeholder" aria-hidden>
-            No data
+            {t('messages.noData')}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={320}>
