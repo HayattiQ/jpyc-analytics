@@ -44,6 +44,7 @@ export const StackedMetricPanel: FC<StackedMetricPanelProps> = ({
   errorMessage,
   onRetry
 }) => {
+  const chartHeight = 260
   const hasError = typeof errorMessage === 'string' && errorMessage.length > 0
   const hasData = data.length > 0
   const showSkeleton = isLoading && !hasError
@@ -66,15 +67,17 @@ export const StackedMetricPanel: FC<StackedMetricPanelProps> = ({
     <section className="panel panel--stacked rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
       <div className="panel-header flex justify-between gap-4 items-start mb-6">
         <div>
-          <h2 className="font-bold">{title}</h2>
-          <p className="panel-subtitle text-sm text-[color:var(--muted)]">{subtitle}</p>
+          <h2 className="font-semibold text-lg leading-tight">{title}</h2>
+          <p className="panel-subtitle text-xs md:text-sm text-[color:var(--muted)] leading-snug">
+            {subtitle}
+          </p>
         </div>
         {confirmedSummary && (
-          <div className="total text-right text-[color:var(--muted)]">
-            <span className="text-xs uppercase tracking-wide">
+          <div className="total text-right text-[color:var(--muted)] text-xs">
+            <span className="uppercase tracking-wide">
               最新（確定） {confirmedSummary.isoDate}
             </span>
-            <strong className="block text-2xl text-[#0f172a]">
+            <strong className="block text-xl text-[#0f172a]">
               {formatSupplyUnits(confirmedSummary.total, tokenSymbol)}
             </strong>
           </div>
@@ -97,11 +100,11 @@ export const StackedMetricPanel: FC<StackedMetricPanelProps> = ({
           )}
         </div>
       )}
-      <div className="chart-wrapper h-[320px]">
+      <div className="chart-wrapper h-[260px]">
         {showSkeleton ? (
           <div className="skeleton" aria-hidden />
         ) : showChart ? (
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
             {(() => {
               const maxValue = data.reduce((max, point) => {
                 const total = series.reduce((sum, s) => sum + Number(point[s.name] ?? 0), 0)

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import config from '../config.json'
 import {
+  buildCumulativeStackedMetricSeries,
   buildDailyFlowSeries,
   buildDailyHolderSeries,
   buildDailySeries,
@@ -15,8 +16,8 @@ import { SupplyPanel } from '../panels/SupplyPanel'
 import { ChainHolderBucketsPanel } from '../panels/ChainHolderBucketsPanel'
 import { TransactionVolumePanel } from '../panels/TransactionVolumePanel'
 import { NetFlowPanel } from '../panels/NetFlowPanel'
-import { DailyIssuancePanel } from '../panels/DailyIssuancePanel'
-import { DailyRedemptionPanel } from '../panels/DailyRedemptionPanel'
+import { CumulativeIssuancePanel } from '../panels/CumulativeIssuancePanel'
+import { CumulativeRedemptionPanel } from '../panels/CumulativeRedemptionPanel'
 
 export function AnalyticsPage() {
   const {
@@ -64,18 +65,20 @@ export function AnalyticsPage() {
     [trackedChains, daysFromStart]
   )
 
-  const issuanceStackedSeries = useMemo(
-    () => buildDailyStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'inflowVolume'),
-    [trackedChains, daysFromStart]
-  )
-
-  const redemptionStackedSeries = useMemo(
-    () => buildDailyStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'outflowVolume'),
-    [trackedChains, daysFromStart]
-  )
-
   const netFlowSeries = useMemo(
     () => buildDailyFlowSeries(trackedChains, Math.floor(daysFromStart)),
+    [trackedChains, daysFromStart]
+  )
+
+  const cumulativeIssuanceSeries = useMemo(
+    () =>
+      buildCumulativeStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'inflowVolume'),
+    [trackedChains, daysFromStart]
+  )
+
+  const cumulativeRedemptionSeries = useMemo(
+    () =>
+      buildCumulativeStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'outflowVolume'),
     [trackedChains, daysFromStart]
   )
 
@@ -119,15 +122,15 @@ export function AnalyticsPage() {
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <DailyIssuancePanel
-          data={issuanceStackedSeries}
-          isLoading={dailyStatsLoading && issuanceStackedSeries.length === 0}
+        <CumulativeIssuancePanel
+          data={cumulativeIssuanceSeries}
+          isLoading={dailyStatsLoading && cumulativeIssuanceSeries.length === 0}
           errorMessage={dailyStatsError}
           onRetry={reloadDailyStats}
         />
-        <DailyRedemptionPanel
-          data={redemptionStackedSeries}
-          isLoading={dailyStatsLoading && redemptionStackedSeries.length === 0}
+        <CumulativeRedemptionPanel
+          data={cumulativeRedemptionSeries}
+          isLoading={dailyStatsLoading && cumulativeRedemptionSeries.length === 0}
           errorMessage={dailyStatsError}
           onRetry={reloadDailyStats}
         />

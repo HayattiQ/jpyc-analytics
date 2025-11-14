@@ -217,6 +217,39 @@ export const buildDailyStackedMetricSeries = (
   })
 }
 
+export const buildCumulativeStackedMetricSeries = (
+  chainStats: ChainDailySeries[],
+  days: number,
+  metric: MetricKey
+): DailySeriesPoint[] => {
+  if (chainStats.length === 0 || days <= 0) return []
+  const timestampUniverse = buildTimestampUniverse(chainStats)
+  const selected = timestampUniverse.slice(-days)
+  if (selected.length === 0) return []
+
+  const metricMaps = chainStats.map((chain) => {
+    const map = new Map<number, number>()
+    chain.stats.forEach((stat) => {
+      map.set(stat.dayStartTimestamp, getStatMetric(stat, metric))
+    })
+    return { name: chain.name, map }
+  })
+
+  const cumulativeTotals = new Map(metricMaps.map(({ name }) => [name, 0]))
+  const sortedSelected = [...selected].sort((a, b) => a - b)
+
+  return sortedSelected.map((timestamp) => {
+    const point: DailySeriesPoint = formatPoint(timestamp)
+    metricMaps.forEach(({ name, map }) => {
+      const previousTotal = cumulativeTotals.get(name) ?? 0
+      const nextTotal = roundValue(previousTotal + (map.get(timestamp) ?? 0))
+      cumulativeTotals.set(name, nextTotal)
+      point[name] = nextTotal
+    })
+    return point
+  })
+}
+
 export interface FlowSeriesPoint {
   label: string
   isoDate: string
