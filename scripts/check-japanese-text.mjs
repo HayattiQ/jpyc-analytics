@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { execSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
 const includeRoots = (process.env.I18N_GUARD_INCLUDE_DIRS || 'web/src').split(',').map((dir) => dir.trim()).filter(Boolean);
 const ignorePatterns = [
@@ -22,28 +22,26 @@ const allowedExtensions = [
   '.scss'
 ];
 
+function runGit(args) {
+  const result = spawnSync('git', args, { encoding: 'utf8' });
+  if (result.status !== 0) {
+    const output = `${result.stdout || ''}${result.stderr || ''}`.trim();
+    throw new Error(output || `git ${args.join(' ')} failed`);
+  }
+  return result.stdout;
+}
+
 function resolveCommit(candidates) {
   for (const ref of candidates) {
     if (!ref) continue;
     try {
-      const sha = execSync(`git rev-parse ${ref}`, { encoding: 'utf8' }).trim();
+      const sha = runGit(['rev-parse', ref]).trim();
       if (sha) return sha;
     } catch (error) {
       // ignore missing commit
     }
   }
   return null;
-}
-
-function runGit(command) {
-  try {
-    return execSync(`git ${command}`, { encoding: 'utf8' });
-  } catch (error) {
-    const stdout = error?.stdout?.toString() ?? '';
-    const stderr = error?.stderr?.toString() ?? '';
-    console.error(stdout + stderr);
-    throw error;
-  }
 }
 
 const head = resolveCommit([
@@ -80,7 +78,7 @@ function isTargetFile(filePath) {
   return true;
 }
 
-const diffNames = runGit(`diff --name-only ${base}...${head}`).split('\n').filter(Boolean).filter(isTargetFile);
+const diffNames = runGit(['diff', '--name-only', `${base}...${head}`]).split('\n').filter(Boolean).filter(isTargetFile);
 
 if (diffNames.length === 0) {
   console.log('日本語検知対象の差分ファイルはありませんでした');
@@ -96,7 +94,7 @@ function escapeAnnotation(text) {
 const findings = [];
 
 diffNames.forEach((filePath) => {
-  const diff = runGit(`diff -U0 ${base}...${head} -- ${filePath}`);
+  const diff = runGit(['diff', '-U0', `${base}...${head}`, '--', filePath]);
   const lines = diff.split('\n');
   let currentLine = 0;
 
@@ -140,5 +138,5 @@ findings.forEach(({ filePath, line, snippet }) => {
   console.log(`::warning file=${filePath},line=${line}::${escapeAnnotation(`日本語テキストを検出: ${truncated}`)}`);
 });
 
-console.log(`日本語テキストを ${findings.length} 件検知しました。翻訳ファイル (locales) に移し、英語訳を追加してください。`);
-process.exit(0);
+console.error(`日本語テキストを ${findings.length} 件検知しました。翻訳ファイル (locales) に移し、英語訳を追加してください。`);
+process.exit(1);
