@@ -10,7 +10,7 @@ export const Footer = () => {
           components={{
             brand: (
               <a className="text-[color:var(--accent)] font-semibold" href="https://x.com/HayattiQ">
-                HayattiQ / はやっち
+                HayattiQ / はやっちさん
               </a>
             )
           }}
