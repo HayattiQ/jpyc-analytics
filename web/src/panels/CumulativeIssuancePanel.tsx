@@ -3,14 +3,14 @@ import config from '../config.json'
 import type { DailySeriesPoint } from '../lib/dailySeries'
 import { StackedMetricPanel } from './StackedMetricPanel'
 
-interface TransactionVolumePanelProps {
+interface CumulativeIssuancePanelProps {
   data: DailySeriesPoint[]
   isLoading: boolean
   errorMessage?: string | null
   onRetry?: () => void
 }
 
-export const TransactionVolumePanel: FC<TransactionVolumePanelProps> = ({
+export const CumulativeIssuancePanel: FC<CumulativeIssuancePanelProps> = ({
   data,
   isLoading,
   errorMessage,
@@ -23,8 +23,8 @@ export const TransactionVolumePanel: FC<TransactionVolumePanelProps> = ({
 
   return (
     <StackedMetricPanel
-      title="日次TX Volume"
-      subtitle="チェーン別の積み上げ推移"
+      title="総発行額（累積）"
+      subtitle="発行額チェーン別積み上げ / 累積値"
       data={data}
       series={series}
       tokenSymbol={tokenSymbol}

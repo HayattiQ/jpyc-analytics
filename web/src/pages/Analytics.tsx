@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import config from '../config.json'
 import {
+  buildCumulativeStackedMetricSeries,
   buildDailyFlowSeries,
   buildDailyHolderSeries,
   buildDailySeries,
@@ -15,6 +16,8 @@ import { SupplyPanel } from '../panels/SupplyPanel'
 import { ChainHolderBucketsPanel } from '../panels/ChainHolderBucketsPanel'
 import { TransactionVolumePanel } from '../panels/TransactionVolumePanel'
 import { NetFlowPanel } from '../panels/NetFlowPanel'
+import { CumulativeIssuancePanel } from '../panels/CumulativeIssuancePanel'
+import { CumulativeRedemptionPanel } from '../panels/CumulativeRedemptionPanel'
 
 export function AnalyticsPage() {
   const {
@@ -67,6 +70,18 @@ export function AnalyticsPage() {
     [trackedChains, daysFromStart]
   )
 
+  const cumulativeIssuanceSeries = useMemo(
+    () =>
+      buildCumulativeStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'inflowVolume'),
+    [trackedChains, daysFromStart]
+  )
+
+  const cumulativeRedemptionSeries = useMemo(
+    () =>
+      buildCumulativeStackedMetricSeries(trackedChains, Math.floor(daysFromStart), 'outflowVolume'),
+    [trackedChains, daysFromStart]
+  )
+
   return (
     <div className="analytics-page flex flex-col gap-6">
       <SupplyPanel
@@ -102,6 +117,20 @@ export function AnalyticsPage() {
         <NetFlowPanel
           data={netFlowSeries}
           isLoading={dailyStatsLoading && netFlowSeries.length === 0}
+          errorMessage={dailyStatsError}
+          onRetry={reloadDailyStats}
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CumulativeIssuancePanel
+          data={cumulativeIssuanceSeries}
+          isLoading={dailyStatsLoading && cumulativeIssuanceSeries.length === 0}
+          errorMessage={dailyStatsError}
+          onRetry={reloadDailyStats}
+        />
+        <CumulativeRedemptionPanel
+          data={cumulativeRedemptionSeries}
+          isLoading={dailyStatsLoading && cumulativeRedemptionSeries.length === 0}
           errorMessage={dailyStatsError}
           onRetry={reloadDailyStats}
         />
