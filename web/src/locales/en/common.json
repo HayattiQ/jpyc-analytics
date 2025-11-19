@@ -1,0 +1,93 @@
+{
+  "hero": {
+    "title": "JPYC Info",
+    "description": "A curated hub for JPYC on-chain analytics and listed services.",
+    "poweredBy": "Powered by <brand>HayattiQ</brand>",
+    "lastUpdated": "Last updated",
+    "loading": "Loading…",
+    "notAvailable": "—"
+  },
+  "tabs": {
+    "navLabel": "Navigation tabs",
+    "analytics": "Analytics",
+    "services": "Services"
+  },
+  "footer": {
+    "poweredBy": "Powered by <brand>HayattiQ</brand>",
+    "github": "GitHub"
+  },
+  "messages": {
+    "latestConfirmed": "Latest (confirmed) {{date}}",
+    "subgraphError": "Failed to fetch data from the subgraph.",
+    "genericError": "Failed to fetch data.",
+    "retry": "Retry",
+    "noData": "No data yet",
+    "refetch": "Please try fetching again",
+    "total": "Total"
+  },
+  "panels": {
+    "supply": {
+      "title": "Real-time Supply by Chain"
+    },
+    "dailySupply": {
+      "title": "Daily Supply"
+    },
+    "holder": {
+      "title": "Daily Holder Count"
+    },
+    "transactionVolume": {
+      "title": "Daily TX Volume",
+      "subtitle": "Stacked trend per chain"
+    },
+    "netFlow": {
+      "title": "Daily Inflow / Outflow",
+      "subtitle": "Issuer mint vs Redeem burn activity",
+      "countsLabel": "Transactions {{inflow}} / {{outflow}}",
+      "tooltip": {
+        "inflow": "Inflow",
+        "outflow": "Outflow"
+      }
+    },
+    "dailyIssuance": {
+      "title": "Daily Issuance from Operator",
+      "subtitle": "Stacked by chain"
+    },
+    "dailyRedemption": {
+      "title": "Daily Redemption to Operator",
+      "subtitle": "Stacked by chain"
+    },
+    "cumulativeIssuance": {
+      "title": "Total Issuance (Cumulative)",
+      "subtitle": "Stacked issuance by chain / cumulative"
+    },
+    "cumulativeRedemption": {
+      "title": "Total Redemption (Cumulative)",
+      "subtitle": "Stacked redemption by chain / cumulative"
+    },
+    "dailyHolderPie": {
+      "title": "Daily Holders (Pie)",
+      "subtitle": "Chains with errors are excluded"
+    },
+    "chainHolderBuckets": {
+      "title": "Holder Share by Balance ({{chain}})"
+    },
+    "chainTable": {
+      "title": "JPYC Details by Chain",
+      "subtitle": "Contract + Issuer / Redeem references",
+      "columns": {
+        "chain": "Chain",
+        "issuer": "Issuer",
+        "redeem": "Redeem",
+        "contract": "Contract Address"
+      },
+      "labels": {
+        "issuer": "Issuer:",
+        "redeem": "Redeem:",
+        "contract": "Contract:"
+      }
+    },
+    "ethHolderBuckets": {
+      "title": "Ethereum Holder Share"
+    }
+  }
+}

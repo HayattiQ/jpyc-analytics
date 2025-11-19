@@ -1,0 +1,8 @@
+{
+  "name": "jpyc-analytics",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "vercel": "vercel dev --local-config web/vercel.dev.json"
+  }
+}

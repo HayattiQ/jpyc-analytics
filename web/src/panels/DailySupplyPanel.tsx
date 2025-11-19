@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Bar,
   BarChart,
@@ -25,6 +26,7 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
   errorMessage,
   onRetry
 }) => {
+  const { t } = useTranslation()
   const tokenSymbol = config.token.symbol
   const series = config.chains
     .filter((c) => c.id === 'ethereum' || c.id === 'polygon' || c.id === 'avalanche')
@@ -47,12 +49,12 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
     <section className="panel panel--compact rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
       <div className="panel-header flex justify-between gap-4 items-start mb-4">
         <div>
-          <h2 className="font-bold">日次供給量</h2>
+          <h2 className="font-bold">{t('panels.dailySupply.title')}</h2>
         </div>
         {confirmedSummary && (
           <div className="total text-right text-[color:var(--muted)]">
             <span className="text-xs uppercase tracking-wide">
-              最新（確定） {confirmedSummary.isoDate}
+              {t('messages.latestConfirmed', { date: confirmedSummary.isoDate })}
             </span>
             <strong className="block text-2xl text-[#0f172a]">
               {formatSupplyUnits(confirmedSummary.total, tokenSymbol)}
@@ -63,7 +65,7 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
       {hasError && (
         <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">
           <div>
-            <strong className="block">サブグラフからの取得に失敗しました。</strong>
+            <strong className="block">{t('messages.subgraphError')}</strong>
             <span>{errorMessage}</span>
           </div>
           {typeof onRetry === 'function' && (
@@ -72,7 +74,7 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
               className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold"
               onClick={() => onRetry()}
             >
-              リトライ
+              {t('messages.retry')}
             </button>
           )}
         </div>
@@ -132,11 +134,11 @@ export const DailySupplyPanel: FC<DailySupplyPanelProps> = ({
           </ResponsiveContainer>
         ) : showEmpty ? (
           <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
-            データはまだありません
+            {t('messages.noData')}
           </div>
         ) : (
           <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
-            取得をやり直してください
+            {t('messages.refetch')}
           </div>
         )}
       </div>

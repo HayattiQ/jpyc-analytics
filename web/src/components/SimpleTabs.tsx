@@ -1,4 +1,6 @@
+import type { MouseEvent } from 'react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 function usePathname() {
   const [pathname, setPathname] = useState<string>(window.location.pathname)
@@ -11,11 +13,11 @@ function usePathname() {
 }
 
 export function SimpleTabs() {
+  const { t } = useTranslation()
   const pathname = usePathname()
   const isAnalytics = pathname === '/' || pathname.startsWith('/analytics')
   const isServices = pathname.startsWith('/services')
-  const isLiquidity = pathname.startsWith('/liquidity')
-  const goto = (to: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const goto = (to: string) => (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     if (window.location.pathname !== to) {
       window.history.pushState({}, '', to)
@@ -27,7 +29,7 @@ export function SimpleTabs() {
   return (
     <nav
       className="top-tabs inline-flex items-center gap-2 justify-center px-2 py-1 mx-auto rounded-full border bg-[var(--surface)] border-[var(--border)] shadow-[0_3px_14px_rgba(15,23,42,0.06)]"
-      aria-label="ページ切替タブ"
+      aria-label={t('tabs.navLabel')}
       role="tablist"
     >
       <a
@@ -43,7 +45,7 @@ export function SimpleTabs() {
         aria-selected={isAnalytics}
         role="tab"
       >
-        Analytics
+        {t('tabs.analytics')}
       </a>
       <span
         aria-hidden="true"
@@ -62,26 +64,7 @@ export function SimpleTabs() {
         aria-selected={isServices}
         role="tab"
       >
-        Services
-      </a>
-      <span
-        aria-hidden="true"
-        className="mx-1 h-6 w-px rounded-full bg-[var(--border)]"
-      />
-      <a
-        href="/liquidity"
-        onClick={goto('/liquidity')}
-        className={[
-          baseClass,
-          isLiquidity
-            ? 'bg-[color:var(--accent-soft)] text-[color:var(--accent)] border-[var(--accent)]'
-            : 'hover:bg-[color:var(--surface-hover)] hover:text-[color:var(--accent)]'
-        ].join(' ')}
-        aria-current={isLiquidity ? 'page' : undefined}
-        aria-selected={isLiquidity}
-        role="tab"
-      >
-        Liquidity
+        {t('tabs.services')}
       </a>
     </nav>
   )

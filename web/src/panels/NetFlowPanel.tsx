@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import config from '../config.json'
 import type { FlowSeriesPoint } from '../lib/dailySeries'
@@ -21,6 +22,7 @@ const UNIT_STEPS = [
 ] as const
 
 export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMessage, onRetry }) => {
+  const { t } = useTranslation()
   const tokenSymbol = config.token.symbol
   const hasError = typeof errorMessage === 'string' && errorMessage.length > 0
   const hasData = data.length > 0
@@ -45,15 +47,15 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
     <section className="panel panel--flow rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
       <div className="panel-header flex justify-between gap-4 items-start mb-6">
         <div>
-          <h2 className="font-bold">日次 Inflow / Outflow</h2>
+          <h2 className="font-bold">{t('panels.netFlow.title')}</h2>
           <p className="panel-subtitle text-sm text-[color:var(--muted)]">
-            Issuer からの供給と Redeem への回収
+            {t('panels.netFlow.subtitle')}
           </p>
         </div>
         {confirmedSummary && (
           <div className="total text-right text-[color:var(--muted)]">
             <span className="text-xs uppercase tracking-wide">
-              最新（確定） {confirmedSummary.isoDate}
+              {t('messages.latestConfirmed', { date: confirmedSummary.isoDate })}
             </span>
             <strong
               className={`block text-2xl ${
@@ -63,9 +65,10 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
               {formatSupplyUnits(confirmedSummary.netInflow, tokenSymbol)}
             </strong>
             <span className="text-sm block mt-1">
-              {`件数 ${numberFormatter.format(confirmedSummary.inflowCount)} / ${numberFormatter.format(
-                confirmedSummary.outflowCount
-              )}`}
+              {t('panels.netFlow.countsLabel', {
+                inflow: numberFormatter.format(confirmedSummary.inflowCount),
+                outflow: numberFormatter.format(confirmedSummary.outflowCount)
+              })}
             </span>
           </div>
         )}
@@ -73,7 +76,7 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
       {hasError && (
         <div className="error-banner border border-red-200 bg-[var(--error-bg)] text-[var(--error-text)] rounded-xl px-4 py-3 flex justify-between items-center gap-4 mb-4">
           <div>
-            <strong className="block">サブグラフからの取得に失敗しました。</strong>
+            <strong className="block">{t('messages.subgraphError')}</strong>
             <span>{errorMessage}</span>
           </div>
           {typeof onRetry === 'function' && (
@@ -82,7 +85,7 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
               className="ghost-button border border-[var(--border)] rounded-full px-4 py-2 font-semibold"
               onClick={() => onRetry()}
             >
-              リトライ
+              {t('messages.retry')}
             </button>
           )}
         </div>
@@ -129,7 +132,9 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
                         name === 'inflow' ? payload.payload.inflowAbs : payload.payload.outflowAbs
                       return [
                         formatSupplyUnits(base, tokenSymbol),
-                        name === 'inflow' ? 'Inflow' : 'Outflow'
+                        name === 'inflow'
+                          ? t('panels.netFlow.tooltip.inflow')
+                          : t('panels.netFlow.tooltip.outflow')
                       ]
                     }}
                     labelFormatter={(label: string, payload) => {
@@ -145,11 +150,11 @@ export const NetFlowPanel: FC<NetFlowPanelProps> = ({ data, isLoading, errorMess
           </ResponsiveContainer>
         ) : showEmpty ? (
           <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
-            データはまだありません
+            {t('messages.noData')}
           </div>
         ) : (
           <div className="flex h-full items-center justify-center text-[color:var(--muted)]">
-            取得をやり直してください
+            {t('messages.refetch')}
           </div>
         )}
       </div>
