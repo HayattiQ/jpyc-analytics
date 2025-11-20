@@ -2,6 +2,7 @@
   "hero": {
     "title": "JPYC Info",
     "description": "A curated hub for JPYC on-chain analytics and listed services.",
+    "tagline": "Catch up on JPYC data & services at a glance",
     "poweredBy": "Powered by <brand>HayattiQ</brand>",
     "lastUpdated": "Last updated",
     "loading": "Loading…",

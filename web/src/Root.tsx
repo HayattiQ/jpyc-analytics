@@ -17,7 +17,7 @@ export default function Root() {
 
   return (
     <div className="app-shell flex flex-col gap-8">
-      <HeroPanel lastUpdated={null} isLoading={false} />
+      <HeroPanel />
       <SimpleTabs />
       {!isServices && <AnalyticsPage />}
       {isServices && <ServicesPage />}
