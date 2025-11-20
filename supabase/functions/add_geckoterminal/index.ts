@@ -74,29 +74,6 @@ const cacheHeaders = {
   "content-type": "application/json; charset=utf-8",
 }
 
-const getJwtPayload = (authorization?: string) => {
-  if (!authorization?.startsWith("Bearer ")) return null
-  const token = authorization.slice("Bearer ".length).trim()
-  const segments = token.split(".")
-  if (segments.length < 2) return null
-  try {
-    const payload = JSON.parse(atob(segments[1]))
-    return payload as Record<string, unknown>
-  } catch {
-    return null
-  }
-}
-
-const ensureServiceRole = (req: Request) => {
-  const payload = getJwtPayload(req.headers.get("authorization") ?? undefined)
-  if (payload?.role !== "service_role") {
-    throw new Response(
-      JSON.stringify({ error: "forbidden", message: "service role required" }),
-      { status: 403, headers: cacheHeaders },
-    )
-  }
-}
-
 const numberFrom = (value?: string) => {
   if (typeof value !== "string") return 0
   const parsed = Number(value)
@@ -149,10 +126,10 @@ const fetchNetworkPools = async (networkId: string, page: string) => {
 }
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")
-const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+const supabaseServiceRoleKey = Deno.env.get("SECRET_KEY_EDGE_FUNCTION")
 
 if (!supabaseUrl || !supabaseServiceRoleKey) {
-  throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY")
+  throw new Error("Missing SUPABASE_URL or SECRET_KEY_EDGE_FUNCTION")
 }
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
@@ -161,7 +138,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
   },
 })
 
-const upsertPools = async (pools: PoolRecord[], fetchedAt: string) => {
+const upsertPools = async (pools: PoolRecord[], fetchedAt: string, runId: number) => {
   const rows = pools
     .filter((pool) => pool.id && pool.address && pool.networkId)
     .map((pool) => ({
@@ -179,6 +156,7 @@ const upsertPools = async (pools: PoolRecord[], fetchedAt: string) => {
       price_change_24h: pool.priceChange24h,
       volume_24h_usd: pool.volume24hUSD,
       fetched_at: fetchedAt,
+      run_id: runId,
     }))
 
   if (rows.length === 0) return { count: 0 }
@@ -195,6 +173,27 @@ const upsertPools = async (pools: PoolRecord[], fetchedAt: string) => {
   return { count: rows.length }
 }
 
+const createRunRecord = async (page: number, networks: string[]) => {
+  const { data, error } = await supabaseAdmin.from("geckoterminal_runs")
+    .insert({
+      page,
+      networks,
+    })
+    .select("id")
+    .single()
+
+  if (error || !data?.id) {
+    throw new Error(
+      `Supabase insert run error: ${
+        error?.message ??
+          "missing id"
+      }`,
+    )
+  }
+
+  return data.id as number
+}
+
 const syncGeckoterminalPools = async (
   { page, networks }: {
     page: string
@@ -202,12 +201,15 @@ const syncGeckoterminalPools = async (
   },
 ) => {
   const fetchedAt = new Date().toISOString()
+  const pageNumber = Number(page) || 1
+  const networkIds = networks.map((n) => n.id)
+  const runId = await createRunRecord(pageNumber, networkIds)
 
   const results = await Promise.all(
     networks.map(async (network) => {
       try {
         const { pools, links } = await fetchNetworkPools(network.id, page)
-        const { count } = await upsertPools(pools, fetchedAt)
+        const { count } = await upsertPools(pools, fetchedAt, runId)
         return {
           networkId: network.id,
           fetched: pools.length,
@@ -226,41 +228,18 @@ const syncGeckoterminalPools = async (
   )
 
   return {
-    page: Number(page) || 1,
-    networks: networks.map((n) => n.id),
+    page: pageNumber,
+    networks: networkIds,
+    runId,
     saved,
     results,
   }
 }
 
-Deno.cron(
-  "sync-geckoterminal",
-  "*/1 * * * *",
-  () => syncGeckoterminalPools({ page: "1", networks: NETWORKS })
-    .then((result) =>
-      console.log(
-        `[geckoterminal] synced page ${result.page}, saved ${result.saved}`,
-      )
-    )
-    .catch((error) =>
-      console.error("[geckoterminal] sync failed:", error),
-    ),
-)
-
 Deno.serve(async (req) => {
   const url = new URL(req.url)
   const page = url.searchParams.get("page") ?? "1"
   const networkParam = url.searchParams.get("network")
-
-  try {
-    ensureServiceRole(req)
-  } catch (resp) {
-    if (resp instanceof Response) return resp
-    return new Response(
-      JSON.stringify({ error: "forbidden" }),
-      { status: 403, headers: cacheHeaders },
-    )
-  }
 
   const targetNetworks = networkParam && NETWORKS.some((
     n,
