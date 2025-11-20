@@ -1,8 +1,8 @@
 {
   "hero": {
     "title": "JPYC Info",
-    "description": "A curated hub for JPYC on-chain analytics and listed services.",
-    "tagline": "Catch up on JPYC data & services at a glance",
+    "description": "One dashboard to review JPYC supply, holder trends, and listed services across chains.",
+    "tagline": "All JPYC metrics & listings in one glance",
     "poweredBy": "Powered by <brand>HayattiQ</brand>",
     "lastUpdated": "Last updated",
     "loading": "Loading…",

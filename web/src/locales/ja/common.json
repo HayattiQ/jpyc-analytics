@@ -1,8 +1,8 @@
 {
   "hero": {
     "title": "JPYC Info",
-    "description": "JPYC のオンチェーン情報や、掲載サービスなど、お役立ち情報をまとめました。",
-    "tagline": "JPYC のデータとサービスをひと目でキャッチアップ",
+    "description": "チェーン別供給量・ホルダー推移・掲載サービス情報をまとめてチェックできる JPYC のダッシュボードです。",
+    "tagline": "オンチェーン指標とサービス掲載を一元ウォッチ",
     "poweredBy": "Powered by <brand>HayattiQ</brand>",
     "lastUpdated": "最終更新",
     "loading": "読み込み中…",
